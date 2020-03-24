@@ -1,0 +1,28 @@
+{
+    "name": "peppermint-backend",
+    "version": "0.0.1",
+    "description": "TBD",
+    "devDependencies": {
+        "@types/body-parser": "^1.19.0",
+        "@types/express": "^4.17.6",
+        "nodemon": "^2.0.4",
+        "prettier": "^2.0.5",
+        "ts-node": "^8.10.2",
+        "typescript": "^3.9.5"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "pg": "^8.2.1",
+        "typeorm": "^0.2.25"
+    },
+    "scripts": {
+        "start": "ts-node src/index.ts",
+        "server": "npm run watch && nodemon ./dist/server.js",
+        "build": "tsc",
+        "watch": "tsc --sourceMap -w &",
+        "test": "nyc --reporter=text mocha -t 60000 -r ts-node/register src/test/*.ts --exit",
+        "lint": "prettier --write src/**/*.ts",
+        "ci:lint": "prettier -c src/**/*.ts"
+    }
+}
