@@ -64,16 +64,18 @@ func GetRecipes(writer http.ResponseWriter, request *http.Request) {
 func UpdateRecipe(writer http.ResponseWriter, request *http.Request) {
 	recipe := &models.Recipe{}
 
-	// recipeID := mux.Vars(request)["id"]
+	// As the ID is not part of the payload, we have to extract it from the params
+	// and set it to the recipe object later.
+	recipeID := mux.Vars(request)["id"]
 
-	// id, err := strconv.Atoi(recipeID)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	id, err := strconv.Atoi(recipeID)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	// id64 := uint(id)
+	id64 := uint(id)
 
-	err := json.NewDecoder(request.Body).Decode(recipe)
+	err = json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
 		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
 
@@ -85,6 +87,8 @@ func UpdateRecipe(writer http.ResponseWriter, request *http.Request) {
 
 		return
 	}
+
+	recipe.ID = id64
 
 	resp := models.UpdateRecipe(recipe)
 	utils.Respond(writer, resp)
