@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/peppermint-recipes/peppermint-server/utils"
 )
@@ -15,33 +17,27 @@ type Recipe struct {
 	Instructions string `gorm:"" json:"instructions"`
 }
 
-func (recipe *Recipe) Validate() (string, bool) {
+func (recipe *Recipe) Validate() error {
 	if recipe.Name == "" {
-		return "Recipe name should be on the payload", false
+		return errors.New("Recipe name should be on the payload")
 	}
-
 	if recipe.Yield == "" {
-		return "Recipe yield should be on the payload", false
+		return errors.New("Recipe yield should be on the payload")
 	}
-
 	if recipe.ActiveTime == "" {
-		return "Recipe activeTime should be on the payload", false
+		return errors.New("Recipe activeTime should be on the payload")
 	}
-
 	if recipe.TotalTime == "" {
-		return "Recipe totalTime should be on the payload", false
+		return errors.New("Recipe totalTime should be on the payload")
 	}
-
 	if recipe.Ingredients == "" {
-		return "Recipe ingredients should be on the payload", false
+		return errors.New("Recipe ingredients should be on the payload")
 	}
-
 	if recipe.Instructions == "" {
-		return "Recipe instructions should be on the payload", false
+		return errors.New("Recipe instructions should be on the payload")
 	}
 
-	//All the required parameters are present
-	return "success", true
+	return nil
 }
 
 func (recipe *Recipe) Create() map[string]interface{} {
@@ -52,11 +48,15 @@ func (recipe *Recipe) Create() map[string]interface{} {
 	return response
 }
 
-func GetRecipe(id uint) *Recipe {
+func GetRecipe(id uint) (error, *Recipe) {
 	recipe := &Recipe{}
 	db.First(&recipe, id)
 
-	return recipe
+	if recipe.ID == 0 {
+		return errors.New("no recipe found"), nil
+	}
+
+	return nil, recipe
 }
 
 func GetRecipes() []Recipe {

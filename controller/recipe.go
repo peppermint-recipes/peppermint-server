@@ -22,8 +22,8 @@ func CreateRecipe(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if errorMessage, ok := recipe.Validate(); !ok {
-		utils.RespondWithError(writer, 500, utils.ErrorMessage(errorMessage))
+	if err = recipe.Validate(); err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
 
 		return
 	}
@@ -40,7 +40,13 @@ func GetOneRecipe(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 	}
 	id64 := uint(id)
-	foundRecipe := models.GetRecipe(id64)
+
+	err, foundRecipe := models.GetRecipe(id64)
+	if err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
+
+		return
+	}
 
 	resp := utils.PrepareReturn()
 	resp["data"] = foundRecipe
@@ -74,8 +80,8 @@ func UpdateRecipe(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if errorMessage, ok := recipe.Validate(); !ok {
-		utils.RespondWithError(writer, 500, utils.ErrorMessage(errorMessage))
+	if err = recipe.Validate(); err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
 
 		return
 	}
@@ -103,8 +109,8 @@ func DeleteRecipe(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	if errorMessage, ok := recipe.Validate(); !ok {
-		utils.RespondWithError(writer, 500, utils.ErrorMessage(errorMessage))
+	if err = recipe.Validate(); err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
 
 		return
 	}
