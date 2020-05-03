@@ -17,7 +17,13 @@ func CreateRecipe(writer http.ResponseWriter, request *http.Request) {
 
 	err := json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
-		utils.Respond(writer, utils.Message(false, "Error while decoding request body"))
+		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
+
+		return
+	}
+
+	if errorMessage, ok := recipe.Validate(); !ok {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(errorMessage))
 
 		return
 	}
@@ -36,7 +42,7 @@ func GetOneRecipe(writer http.ResponseWriter, request *http.Request) {
 	id64 := uint(id)
 	foundRecipe := models.GetRecipe(id64)
 
-	resp := utils.Message(true, "success")
+	resp := utils.PrepareReturn()
 	resp["data"] = foundRecipe
 	utils.Respond(writer, resp)
 }
@@ -44,7 +50,7 @@ func GetOneRecipe(writer http.ResponseWriter, request *http.Request) {
 func GetRecipes(writer http.ResponseWriter, request *http.Request) {
 	foundRecipes := models.GetRecipes()
 
-	resp := utils.Message(true, "success")
+	resp := utils.PrepareReturn()
 	resp["data"] = foundRecipes
 	utils.Respond(writer, resp)
 }
@@ -52,22 +58,27 @@ func GetRecipes(writer http.ResponseWriter, request *http.Request) {
 func UpdateRecipe(writer http.ResponseWriter, request *http.Request) {
 	recipe := &models.Recipe{}
 
-	recipeID := mux.Vars(request)["id"]
+	// recipeID := mux.Vars(request)["id"]
 
-	id, err := strconv.Atoi(recipeID)
+	// id, err := strconv.Atoi(recipeID)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+
+	// id64 := uint(id)
+
+	err := json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
-		fmt.Println(err)
+		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
+
+		return
 	}
 
-	id64 := uint(id)
+	if errorMessage, ok := recipe.Validate(); !ok {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(errorMessage))
 
-	err = json.NewDecoder(request.Body).Decode(recipe)
-	if err != nil {
-
-		fmt.Println(err)
-		utils.Respond(writer, utils.Message(false, "Error while decoding request body"))
 		return
-	}stringchan
+	}
 
 	resp := models.UpdateRecipe(recipe)
 	utils.Respond(writer, resp)
@@ -87,9 +98,14 @@ func DeleteRecipe(writer http.ResponseWriter, request *http.Request) {
 
 	err = json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
 
-		fmt.Println(err)
-		utils.Respond(writer, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	if errorMessage, ok := recipe.Validate(); !ok {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(errorMessage))
+
 		return
 	}
 
@@ -97,5 +113,4 @@ func DeleteRecipe(writer http.ResponseWriter, request *http.Request) {
 
 	resp := models.DeleteRecipe(recipe)
 	utils.Respond(writer, resp)
-
 }

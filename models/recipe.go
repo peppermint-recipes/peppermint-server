@@ -15,47 +15,41 @@ type Recipe struct {
 	Instructions string `gorm:"" json:"instructions"`
 }
 
-func (recipe *Recipe) Validate() (map[string]interface{}, bool) {
-
+func (recipe *Recipe) Validate() (string, bool) {
 	if recipe.Name == "" {
-		return utils.Message(false, "Recipe name should be on the payload"), false
+		return "Recipe name should be on the payload", false
 	}
 
 	if recipe.Yield == "" {
-		return utils.Message(false, "Recipe yield should be on the payload"), false
+		return "Recipe yield should be on the payload", false
 	}
 
 	if recipe.ActiveTime == "" {
-		return utils.Message(false, "Recipe activeTime should be on the payload"), false
+		return "Recipe activeTime should be on the payload", false
 	}
 
 	if recipe.TotalTime == "" {
-		return utils.Message(false, "Recipe totalTime should be on the payload"), false
+		return "Recipe totalTime should be on the payload", false
 	}
 
 	if recipe.Ingredients == "" {
-		return utils.Message(false, "Recipe ingredients should be on the payload"), false
+		return "Recipe ingredients should be on the payload", false
 	}
 
 	if recipe.Instructions == "" {
-		return utils.Message(false, "Recipe instructions should be on the payload"), false
+		return "Recipe instructions should be on the payload", false
 	}
 
 	//All the required parameters are present
-	return utils.Message(true, "success"), true
+	return "success", true
 }
 
 func (recipe *Recipe) Create() map[string]interface{} {
-
-	if resp, ok := recipe.Validate(); !ok {
-		return resp
-	}
-
 	db.Create(recipe)
 
-	resp := utils.Message(true, "success")
-	resp["recipe"] = recipe
-	return resp
+	response := utils.PrepareReturn()
+	response["recipe"] = recipe
+	return response
 }
 
 func GetRecipe(id uint) *Recipe {
@@ -73,24 +67,16 @@ func GetRecipes() []Recipe {
 }
 
 func UpdateRecipe(recipe *Recipe) map[string]interface{} {
-	if resp, ok := recipe.Validate(); !ok {
-		return resp
-	}
-
 	db.Save(&recipe)
-	resp := utils.Message(true, "success")
-	resp["recipe"] = recipe
+	response := utils.PrepareReturn()
+	response["recipe"] = recipe
 
-	return resp
+	return response
 }
 
 func DeleteRecipe(recipe *Recipe) map[string]interface{} {
-	if resp, ok := recipe.Validate(); !ok {
-		return resp
-	}
-
 	db.Delete(&recipe)
-	resp := utils.Message(true, "success")
+	response := utils.PrepareReturn()
 
-	return resp
+	return response
 }
