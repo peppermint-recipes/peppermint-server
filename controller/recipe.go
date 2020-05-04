@@ -12,48 +12,61 @@ import (
 	"github.com/peppermint-recipes/peppermint-server/utils"
 )
 
-func CreateRecipe(w http.ResponseWriter, r *http.Request) {
+func CreateRecipe(writer http.ResponseWriter, request *http.Request) {
 	recipe := &models.Recipe{}
 
-	err := json.NewDecoder(r.Body).Decode(recipe)
+	err := json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
 
-		fmt.Println(err)
-		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	if err = recipe.Validate(); err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
+
 		return
 	}
 
 	resp := recipe.Create()
-	utils.Respond(w, resp)
+	utils.Respond(writer, resp)
 }
 
-func GetOneRecipe(w http.ResponseWriter, r *http.Request) {
-	recipeID := mux.Vars(r)["id"]
+func GetOneRecipe(writer http.ResponseWriter, request *http.Request) {
+	recipeID := mux.Vars(request)["id"]
 
 	id, err := strconv.Atoi(recipeID)
 	if err != nil {
 		fmt.Println(err)
 	}
 	id64 := uint(id)
-	foundRecipe := models.GetRecipe(id64)
 
-	resp := utils.Message(true, "success")
+	err, foundRecipe := models.GetRecipe(id64)
+	if err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
+
+		return
+	}
+
+	resp := utils.PrepareReturn()
 	resp["data"] = foundRecipe
-	utils.Respond(w, resp)
+	utils.Respond(writer, resp)
 }
 
-func GetRecipes(w http.ResponseWriter, r *http.Request) {
+func GetRecipes(writer http.ResponseWriter, request *http.Request) {
 	foundRecipes := models.GetRecipes()
 
-	resp := utils.Message(true, "success")
+	resp := utils.PrepareReturn()
 	resp["data"] = foundRecipes
-	utils.Respond(w, resp)
+	utils.Respond(writer, resp)
 }
 
-func UpdateRecipe(w http.ResponseWriter, r *http.Request) {
+func UpdateRecipe(writer http.ResponseWriter, request *http.Request) {
 	recipe := &models.Recipe{}
 
-	recipeID := mux.Vars(r)["id"]
+	// As the ID is not part of the payload, we have to extract it from the params
+	// and set it to the recipe object later.
+	recipeID := mux.Vars(request)["id"]
 
 	id, err := strconv.Atoi(recipeID)
 	if err != nil {
@@ -62,24 +75,29 @@ func UpdateRecipe(w http.ResponseWriter, r *http.Request) {
 
 	id64 := uint(id)
 
-	err = json.NewDecoder(r.Body).Decode(recipe)
+	err = json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
 
-		fmt.Println(err)
-		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	if err = recipe.Validate(); err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
+
 		return
 	}
 
 	recipe.ID = id64
 
 	resp := models.UpdateRecipe(recipe)
-	utils.Respond(w, resp)
+	utils.Respond(writer, resp)
 }
 
-func DeleteRecipe(w http.ResponseWriter, r *http.Request) {
+func DeleteRecipe(writer http.ResponseWriter, request *http.Request) {
 	recipe := &models.Recipe{}
 
-	recipeID := mux.Vars(r)["id"]
+	recipeID := mux.Vars(request)["id"]
 
 	id, err := strconv.Atoi(recipeID)
 	if err != nil {
@@ -88,17 +106,21 @@ func DeleteRecipe(w http.ResponseWriter, r *http.Request) {
 
 	id64 := uint(id)
 
-	err = json.NewDecoder(r.Body).Decode(recipe)
+	err = json.NewDecoder(request.Body).Decode(recipe)
 	if err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage("Error while decoding request body"))
 
-		fmt.Println(err)
-		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	if err = recipe.Validate(); err != nil {
+		utils.RespondWithError(writer, 500, utils.ErrorMessage(err.Error()))
+
 		return
 	}
 
 	recipe.ID = id64
 
 	resp := models.DeleteRecipe(recipe)
-	utils.Respond(w, resp)
-
+	utils.Respond(writer, resp)
 }
