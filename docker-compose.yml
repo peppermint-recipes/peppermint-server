@@ -1,28 +1,52 @@
-# Use root/example as user/password credentials
-version: '3.1'
-
+version: '3'
 services:
-  db:
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
-    ports:
-            - 127.0.0.1:3306:3306
+  peppermint-backend:
+    image: node:13
+    container_name: peppermint-backend
+    volumes:
+      - .:/peppermint/:cached
+    working_dir: /peppermint
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: peppermint
+    - API_PORT=1337
+    - API_HOST=http:/peppermint-backend
+    - DBDATABASE=peppermint-db
+    - DBHOST=peppermint-postgres
+    - DBPASSWORD=1234
+    - DBPORT=5432
+    - DBUSER=peppermint-user
+    - NODE_ENV=local
+    - SECRET=SECRETKEY
+    command: ./run.sh
+    ports:
+      - 127.0.0.1:1337:1337
+    depends_on:
+      - peppermint-postgres
+
+  peppermint-postgres:
+    image: postgres:11
+    container_name: peppermint-postgres
+    environment:
+      - POSTGRES_USER=peppermint-user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=peppermint-db
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+    ports:
+      - 127.0.0.1:5432:5432
 
   adminer:
-    image: adminer
-    ports:
-        - 127.0.0.1:3307:8080
-
-  phpadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    links: 
-        -  'db'
-    ports:
-        - 127.0.0.1:3308:80
+    image: adminer:latest
+    depends_on:
+      - peppermint-postgres
     environment:
-        PMA_HOST: db
-        PMA_PORT: 3306
-  
+      ADMINER_DEFAULT_DB_DRIVER: postgres
+      ADMINER_DEFAULT_DB_HOST: peppermint-postgres
+      ADMINER_DEFAULT_DB_NAME: peppermint-db
+      ADMINER_DESIGN: nette
+    ports:
+      - 127.0.0.1:8000:8080
+    depends_on:
+      - peppermint-postgres
+
+volumes:
+  postgres-volume:
