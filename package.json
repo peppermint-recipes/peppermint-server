@@ -22,7 +22,7 @@
         "build": "tsc",
         "watch": "tsc --sourceMap -w &",
         "test": "nyc --reporter=text mocha -t 60000 -r ts-node/register src/test/*.ts --exit",
-        "lint": "prettier --write src/**/*.ts && prettier --write init-scripts/*.js",
+        "lint": "prettier --write src/**/*.ts",
         "ci:lint": "prettier -c src/**/*.ts"
     }
 }

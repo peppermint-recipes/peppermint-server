@@ -29,7 +29,7 @@ export class RecipeService {
                 activeTime: options.activeTime,
                 totalTime: options.totalTime,
                 ingredients: options.ingredients,
-                instructions: options.instructions
+                instructions: options.instructions,
             });
 
             return await recipeRepository.save(recipe);
@@ -96,7 +96,9 @@ export class RecipeService {
             recipe.servings = options.servings
                 ? options.servings
                 : recipe.servings;
-            recipe.activeTime = options.activeTime ? options.activeTime : recipe.activeTime;
+            recipe.activeTime = options.activeTime
+                ? options.activeTime
+                : recipe.activeTime;
             recipe.totalTime = options.totalTime
                 ? options.totalTime
                 : recipe.totalTime;
