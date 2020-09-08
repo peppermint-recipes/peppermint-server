@@ -1,7 +1,7 @@
 version: '3'
 services:
   peppermint-backend:
-    image: node:13
+    image: node:14
     container_name: peppermint-backend
     volumes:
       - .:/peppermint/:cached
@@ -14,7 +14,7 @@ services:
     - DBPASSWORD=1234
     - DBPORT=5432
     - DBUSER=peppermint-user
-    - NODE_ENV=local
+    - NODE_ENV=docker
     - SECRET=SECRETKEY
     command: ./run.sh
     ports:
@@ -23,7 +23,7 @@ services:
       - peppermint-postgres
 
   peppermint-postgres:
-    image: postgres:11
+    image: postgres:12
     container_name: peppermint-postgres
     environment:
       - POSTGRES_USER=peppermint-user
