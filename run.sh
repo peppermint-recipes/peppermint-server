@@ -13,13 +13,18 @@ echo "Installing required npm packages"
 yarn install
 echo "npm packages installed"
 
-# Build application
-echo "Building api"
-yarn build
+# Create docker env file
+cat << EOF > docker.env
+DBDATABASE=$DBDATABASE
+DBHOST=$DBHOST
+DBPASSWORD=$DBPASSWORD
+DBPORT=$DBPORT
+DBUSER=$DBUSER
+EOF
 
-# Run the application
+
 echo "Starting api"
-yarn server
+NODE_ENV=docker yarn run start:dev
 
 # Keep container running
 tail -f /dev/null
