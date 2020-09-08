@@ -11,15 +11,20 @@ import { Recipe } from "../recipe/recipe-model";
 @Injectable()
 export class ConfigService implements TypeOrmOptionsFactory {
     private readonly envConfig: dotenv.DotenvParseOutput;
+    private readonly environment: string;
 
     constructor() {
-        const fileName = path.join(process.cwd(), `.env`);
+        this.environment = process.env.NODE_ENV || "local"
+        const fileName = path.join(process.cwd(), `${this.environment}.env`);
+        console.log(fileName)
         this.envConfig = dotenv.parse(
             fs.readFileSync(fileName)
         );
     }
 
     createTypeOrmOptions(): TypeOrmModuleOptions {
+        console.log(this.environment);
+        console.log(this.envConfig);
         return {
             type: "postgres",
             host: this.envConfig.DBHOST,
