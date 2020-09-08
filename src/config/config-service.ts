@@ -16,15 +16,12 @@ export class ConfigService implements TypeOrmOptionsFactory {
     constructor() {
         this.environment = process.env.NODE_ENV || "local"
         const fileName = path.join(process.cwd(), `${this.environment}.env`);
-        console.log(fileName)
         this.envConfig = dotenv.parse(
             fs.readFileSync(fileName)
         );
     }
 
     createTypeOrmOptions(): TypeOrmModuleOptions {
-        console.log(this.environment);
-        console.log(this.envConfig);
         return {
             type: "postgres",
             host: this.envConfig.DBHOST,
