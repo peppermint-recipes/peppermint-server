@@ -1,0 +1,43 @@
+name: Postgres Service Example
+
+on:
+  push:
+    branches:
+      - master
+      - e2e-tests
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  # Runs all steps on the VM
+  # The service containers will use host port binding instead of container networking so you access them via localhost rather than the service name
+  vm-job:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          # will assign a random free host port
+          - 5432/tcp
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v1
+      - run: yarn install --non-interactive --check-files --frozen-lockfile --network-concurrency 1
+      - run: |
+          cat << EOF > test.env
+          DBDATABASE=postgres
+          DBHOST=postgres
+          DBPASSWORD=postgres
+          DBPORT=${{ job.services.postgres.ports[5432] }}
+          DBUSER=postgres
+          EOF
+
+      - run: yarn run test:e2e
