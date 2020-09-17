@@ -1,17 +1,14 @@
-import * as request from "supertest";
-import { Test } from "@nestjs/testing";
+import { getConnection } from "typeorm";
 import { INestApplication } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { getConnection, getManager } from "typeorm";
 
-// import { ProductTagModule } from '../src/product-tag/product-tag-module';
-// import { ProductTag } from '../src/product-tag/product-tag-model';
-// import { ProductTagRepository } from '../src/product-tag/product-tag-repository';
-import { RecipeModule } from "../src/recipe/recipe-module";
-import { RecipeRepository } from "../src/recipe/recipe-repository";
-import { Recipe } from "../src/recipe/recipe-model";
+import * as request from "supertest";
+
 import { ConfigModule } from "../src/config/config-module";
 import { ConfigService } from "../src/config/config-service";
+import { Recipe } from "../src/recipe/recipe-model";
+import { RecipeModule } from "../src/recipe/recipe-module";
 
 describe("RecipeController (/api/recipes) (e2e)", () => {
     let app: INestApplication;
