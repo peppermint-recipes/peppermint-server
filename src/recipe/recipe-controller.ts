@@ -65,7 +65,7 @@ export class RecipeController {
     }
 
     @Post("api/recipes/")
-    async createUser(@Body() recipeDto: RecipeDto) {
+    async createProduct(@Body() recipeDto: RecipeDto) {
         const recipe = new Recipe({
             name: recipeDto.name,
             servings: recipeDto.servings,
