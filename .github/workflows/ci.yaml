@@ -5,9 +5,9 @@ on:
     branches:
       - master
       - e2e-tests
-  pull_request:
-    branches:
-      - master
+  # pull_request:
+  #   branches:
+  #     - master
 
 jobs:
   # Runs all steps on the VM
@@ -33,7 +33,7 @@ jobs:
       - run: yarn install --non-interactive --check-files --frozen-lockfile --network-concurrency 1
       - run: |
           cat << EOF > test.env
-          DBDATABASE=postgres
+          DBDATABASE=$POSTGRES_HOST
           DBHOST=postgres
           DBPASSWORD=postgres
           DBPORT=${{ job.services.postgres.ports[5432] }}
