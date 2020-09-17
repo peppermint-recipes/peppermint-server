@@ -13,7 +13,7 @@ import { Recipe } from "../src/recipe/recipe-model";
 import { ConfigModule } from "../src/config/config-module";
 import { ConfigService } from "../src/config/config-service";
 
-describe("RecipeController (/api/tags) (e2e)", () => {
+describe("RecipeController (/api/recipes) (e2e)", () => {
     let app: INestApplication;
 
     // Based on https://github.com/nestjs/nest/issues/409
