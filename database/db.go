@@ -15,6 +15,7 @@ const (
 	// Timeout operations after N seconds
 	connectTimeout           = 5
 	connectionStringTemplate = "mongodb://%s:%s@%s"
+	DatabaseName             = "peppermint-recipes"
 )
 
 // GetConnection Retrieves a client to the MongoDB

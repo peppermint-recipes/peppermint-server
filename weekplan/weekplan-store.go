@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	recipeCollectionName = "weekplans"
+	weekplanCollectionName = "weekplans"
 )
 
 var (
@@ -31,7 +31,7 @@ func getAllWeekplans() ([]*weekPlan, error) {
 	defer cancel()
 	defer client.Disconnect(ctx)
 	db := client.Database(database.DatabaseName)
-	collection := db.Collection(recipeCollectionName)
+	collection := db.Collection(weekplanCollectionName)
 
 	cursor, err := collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -63,7 +63,7 @@ func getWeekplanByID(id string) (*weekPlan, error) {
 	}
 
 	db := client.Database(database.DatabaseName)
-	collection := db.Collection(recipeCollectionName)
+	collection := db.Collection(weekplanCollectionName)
 	result := collection.FindOne(ctx, bson.D{{"id", mongoObjectID}})
 	if result == nil {
 		return nil, errCouldNotFindWeekplan
@@ -86,7 +86,7 @@ func createWeekplan(weekplan *weekPlan) (primitive.ObjectID, error) {
 
 	weekplan.ID = primitive.NewObjectID()
 
-	insertWeekplanResult, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).InsertOne(ctx, weekplan)
+	insertWeekplanResult, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).InsertOne(ctx, weekplan)
 	if err != nil {
 		log.Printf("Could not create Weekplan: %v", err)
 		return primitive.NilObjectID, errCouldNotCreateWeekplan
@@ -115,7 +115,7 @@ func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(recipeCollectionName).FindOneAndUpdate(
+	err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).FindOneAndUpdate(
 		ctx, bson.M{"id": weekplan.ID}, update, &opt).Decode(&updatedWeekplan)
 	if err != nil {
 		log.Printf("Could not save Weekplan: %v", err)
@@ -131,7 +131,7 @@ func deleteWeekplan(weekplan *weekPlan) error {
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	_, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).DeleteOne(ctx, weekplan)
+	_, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).DeleteOne(ctx, weekplan)
 	if err != nil {
 		log.Printf("Could not delete Weekplan: %v", err)
 

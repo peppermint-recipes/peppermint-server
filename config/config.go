@@ -16,6 +16,7 @@ type DBConfig struct {
 	Password string
 }
 
+// TODO: add GIN_MODE=release
 type WebServerConfig struct {
 	Address string
 	Port    string

@@ -88,6 +88,7 @@ func (rs *weekplanServer) UpdateWeekplanHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"weekplan": savedWeekplan})
 }
 
+// TODO: Fix
 func (rs *weekplanServer) DeleteWeekplanHandler(c *gin.Context) {
 	var weekplan weekPlan
 

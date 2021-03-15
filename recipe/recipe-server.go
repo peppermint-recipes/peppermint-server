@@ -84,6 +84,7 @@ func (rs *recipeServer) UpdateRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"recipe": savedRecipe})
 }
 
+// TODO: Fix
 func (rs *recipeServer) DeleteRecipeHandler(c *gin.Context) {
 	var recipe Recipe
 	if err := c.ShouldBindJSON(&recipe); err != nil {
