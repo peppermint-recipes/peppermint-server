@@ -30,14 +30,12 @@ func (rs *recipeServer) GetAllRecipesHandler(c *gin.Context) {
 }
 
 func (rs *recipeServer) GetRecipeByIDHandler(c *gin.Context) {
-	var recipe Recipe
-	if err := c.BindUri(&recipe); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-	var loadedRecipe, err = getRecipeByID(recipe.ID)
+	recipeID := c.Param("id")
+
+	var loadedRecipe, err = getRecipeByID(recipeID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": err})
+
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"Recipe": loadedRecipe})
