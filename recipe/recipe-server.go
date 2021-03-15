@@ -1,0 +1,89 @@
+package recipe
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/peppermint-recipes/peppermint-server/database"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+type recipeServer struct {
+	// store *taskstore.TaskStore
+	mongoClient *mongo.Client
+}
+
+func NewRecipeServer() *recipeServer {
+	mongoClient, _, _ := database.GetConnection()
+	return &recipeServer{mongoClient: mongoClient}
+}
+
+func (rs *recipeServer) GetAllRecipesHandler(c *gin.Context) {
+	var loadedTasks, err = getAllRecipes()
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": err})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"recipes": loadedTasks})
+}
+
+func (rs *recipeServer) GetRecipeByIDHandler(c *gin.Context) {
+	var recipe Recipe
+	if err := c.BindUri(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+	var loadedRecipe, err = getRecipeByID(recipe.ID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": err})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"Recipe": loadedRecipe})
+}
+
+func (rs *recipeServer) CreateRecipeHandler(c *gin.Context) {
+	var recipe Recipe
+	fmt.Printf("%v", c)
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+	}
+
+	id, err := createRecipe(&recipe)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"id": id})
+}
+
+func (rs *recipeServer) UpdateRecipeHandler(c *gin.Context) {
+	var recipe Recipe
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		log.Print(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+	savedRecipe, err := updateRecipe(&recipe)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"recipe": savedRecipe})
+}
+
+func (rs *recipeServer) DeleteRecipeHandler(c *gin.Context) {
+	var recipe Recipe
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		log.Print(err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
+	err := deleteRecipe(&recipe)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"recipe": recipe})
+}
