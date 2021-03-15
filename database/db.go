@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,11 +17,23 @@ const (
 	DatabaseName             = "peppermint-recipes"
 )
 
+var (
+	mongoUsername string
+	mongoPassword string
+	mongoEndpoint string
+)
+
+func RegisterConnection(username string, password string, endpoint string) {
+	mongoUsername = username
+	mongoPassword = password
+	mongoEndpoint = endpoint
+}
+
 // GetConnection Retrieves a client to the MongoDB
 func GetConnection() (*mongo.Client, context.Context, context.CancelFunc) {
-	username := os.Getenv("MONGODB_USERNAME")
-	password := os.Getenv("MONGODB_PASSWORD")
-	clusterEndpoint := os.Getenv("MONGODB_ENDPOINT")
+	username := mongoUsername
+	password := mongoPassword
+	clusterEndpoint := mongoEndpoint
 
 	connectionURI := fmt.Sprintf(connectionStringTemplate, username, password, clusterEndpoint)
 

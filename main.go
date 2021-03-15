@@ -3,33 +3,27 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/peppermint-recipes/peppermint-server/config"
+	"github.com/peppermint-recipes/peppermint-server/database"
 	"github.com/peppermint-recipes/peppermint-server/recipe"
 	shoppinglist "github.com/peppermint-recipes/peppermint-server/shopping-list"
 	"github.com/peppermint-recipes/peppermint-server/weekplan"
 )
 
-// func main() {
-// 	router := gin.Default()
-// 	server := NewTaskServer()
+func livezHandler(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "healthy",
+	})
+}
 
-// 	router.POST("/task/", server.createTaskHandler)
-// 	router.GET("/task/", server.getAllTasksHandler)
-// 	router.DELETE("/task/", server.deleteAllTasksHandler)
-// 	router.GET("/task/:id", server.getTaskHandler)
-// 	router.DELETE("/task/:id", server.deleteTaskHandler)
-// 	router.GET("/tag/:tag", server.tagHandler)
-// 	router.GET("/due/:year/:month/:day", server.dueHandler)
+func setupServer(dbConfig *config.DBConfig) *gin.Engine {
+	database.RegisterConnection(dbConfig.Username, dbConfig.Password, dbConfig.Endpoint)
 
-// 	router.Run("localhost:" + os.Getenv("SERVERPORT"))
-// }
-
-func main() {
-
-	config := config.GetConfig()
 	router := gin.Default()
 	recipeServer := recipe.NewRecipeServer()
 	weekplanServer := weekplan.NewWeekplanServer()
 	shoppingListServer := shoppinglist.NewShoppingListServer()
+
+	router.GET("/livez", livezHandler)
 
 	router.GET("/recipes/:id", recipeServer.GetRecipeByIDHandler)
 	router.GET("/recipes/", recipeServer.GetAllRecipesHandler)
@@ -49,5 +43,10 @@ func main() {
 	router.PUT("/shopping-lists/", shoppingListServer.UpdateWeekplanHandler)
 	router.DELETE("/shopping-lists/:id", shoppingListServer.DeleteWeekplanHandler)
 
-	router.Run(config.Web.Address + ":" + config.Web.Port)
+	return router
+}
+
+func main() {
+	config := config.GetConfig()
+	setupServer(config.DB).Run(config.Web.Address + ":" + config.Web.Port)
 }
