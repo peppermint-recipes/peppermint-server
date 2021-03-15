@@ -1,5 +1,2 @@
-.nyc_output
-node_modules
-dist/
-yarn-error.log
 *.env
+peppermint-server
