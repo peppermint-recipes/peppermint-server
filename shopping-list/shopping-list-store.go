@@ -126,12 +126,21 @@ func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
 	return updatedShoppingList, nil
 }
 
-func deleteShoppingList(sl *shoppingList) error {
+func deleteShoppingList(id string) error {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	_, err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).DeleteOne(ctx, sl)
+	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("Could not create object id from string. %v", err)
+
+		return errCouldNotCreateObjectID
+	}
+
+	_, err = client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).DeleteOne(
+		ctx, bson.D{{"id", mongoObjectID}},
+	)
 	if err != nil {
 		log.Printf("Could not delete shopping list: %v", err)
 

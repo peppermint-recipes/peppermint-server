@@ -126,12 +126,21 @@ func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 	return updatedWeekplan, nil
 }
 
-func deleteWeekplan(weekplan *weekPlan) error {
+func deleteWeekplan(id string) error {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	_, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).DeleteOne(ctx, weekplan)
+	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("Could not create object id from string. %v", err)
+
+		return errCouldNotCreateObjectID
+	}
+
+	_, err = client.Database(database.DatabaseName).Collection(weekplanCollectionName).DeleteOne(
+		ctx, bson.D{{"id", mongoObjectID}},
+	)
 	if err != nil {
 		log.Printf("Could not delete Weekplan: %v", err)
 

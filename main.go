@@ -35,19 +35,19 @@ func main() {
 	router.GET("/recipes/", recipeServer.GetAllRecipesHandler)
 	router.POST("/recipes/", recipeServer.CreateRecipeHandler)
 	router.PUT("/recipes/", recipeServer.UpdateRecipeHandler)
-	router.DELETE("/recipes/", recipeServer.DeleteRecipeHandler)
+	router.DELETE("/recipes/:id", recipeServer.DeleteRecipeHandler)
 
 	router.GET("/weekplans/:id", weekplanServer.GetWeekplanByIDHandler)
 	router.GET("/weekplans/", weekplanServer.GetAllWeekplansHandler)
 	router.POST("/weekplans/", weekplanServer.CreateWeekplanHandler)
 	router.PUT("/weekplans/", weekplanServer.UpdateWeekplanHandler)
-	router.DELETE("/weekplans/", weekplanServer.DeleteWeekplanHandler)
+	router.DELETE("/weekplans/:id", weekplanServer.DeleteWeekplanHandler)
 
 	router.GET("/shopping-lists/:id", shoppingListServer.GetShoppingListsByIDHandler)
 	router.GET("/shopping-lists/", shoppingListServer.GetAllWeekplansHandler)
 	router.POST("/shopping-lists/", shoppingListServer.CreateWeekplanHandler)
 	router.PUT("/shopping-lists/", shoppingListServer.UpdateWeekplanHandler)
-	router.DELETE("/shopping-lists/", shoppingListServer.DeleteWeekplanHandler)
+	router.DELETE("/shopping-lists/:id", shoppingListServer.DeleteWeekplanHandler)
 
 	router.Run(config.Web.Address + ":" + config.Web.Port)
 }

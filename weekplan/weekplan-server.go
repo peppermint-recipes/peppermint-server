@@ -88,19 +88,15 @@ func (rs *weekplanServer) UpdateWeekplanHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"weekplan": savedWeekplan})
 }
 
-// TODO: Fix
 func (rs *weekplanServer) DeleteWeekplanHandler(c *gin.Context) {
-	var weekplan weekPlan
+	weekplanID := c.Param("id")
 
-	if err := c.ShouldBindJSON(&weekplan); err != nil {
-		log.Print(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-	err := deleteWeekplan(&weekplan)
+	err := deleteWeekplan(weekplanID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"weekplan": weekplan})
+
+	c.JSON(http.StatusOK, gin.H{"id": weekplanID})
 }

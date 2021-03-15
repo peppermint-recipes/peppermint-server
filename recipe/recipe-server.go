@@ -2,7 +2,6 @@ package recipe
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -48,7 +47,7 @@ func (rs *recipeServer) GetRecipeByIDHandler(c *gin.Context) {
 
 func (rs *recipeServer) CreateRecipeHandler(c *gin.Context) {
 	var recipe Recipe
-	fmt.Printf("%v", c)
+
 	if err := c.ShouldBindJSON(&recipe); err != nil {
 		c.String(http.StatusBadRequest, err.Error())
 
@@ -84,18 +83,13 @@ func (rs *recipeServer) UpdateRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"recipe": savedRecipe})
 }
 
-// TODO: Fix
 func (rs *recipeServer) DeleteRecipeHandler(c *gin.Context) {
-	var recipe Recipe
-	if err := c.ShouldBindJSON(&recipe); err != nil {
-		log.Print(err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": err})
-		return
-	}
-	err := deleteRecipe(&recipe)
+	recipeID := c.Param("id")
+
+	err := deleteRecipe(recipeID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"recipe": recipe})
+	c.JSON(http.StatusOK, gin.H{"ID": recipeID})
 }

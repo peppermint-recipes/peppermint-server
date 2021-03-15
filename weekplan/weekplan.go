@@ -34,7 +34,6 @@ func (wp *weekPlan) isValid() bool {
 		return false
 	}
 
-	// TODO
 	if wp.CalendarWeek <= 0 || wp.CalendarWeek >= 53 {
 		return false
 	}

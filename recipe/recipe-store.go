@@ -85,15 +85,13 @@ func createRecipe(recipe *Recipe) (primitive.ObjectID, error) {
 
 	recipe.ID = primitive.NewObjectID()
 
-	insertRecipeResult, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).InsertOne(ctx, recipe)
+	_, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).InsertOne(ctx, recipe)
 	if err != nil {
 		log.Printf("Could not create Recipe: %v", err)
 		return primitive.NilObjectID, errCouldNotCreateRecipe
 	}
 
-	databaseObjectID := insertRecipeResult.InsertedID.(primitive.ObjectID)
-
-	return databaseObjectID, nil
+	return recipe.ID, nil
 }
 
 func updateRecipe(recipe *Recipe) (*Recipe, error) {
@@ -125,12 +123,21 @@ func updateRecipe(recipe *Recipe) (*Recipe, error) {
 	return updatedRecipe, nil
 }
 
-func deleteRecipe(recipe *Recipe) error {
+func deleteRecipe(id string) error {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	_, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).DeleteOne(ctx, recipe)
+	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		log.Printf("Could not create object id from string. %v", err)
+
+		return errCouldNotCreateObjectID
+	}
+
+	_, err = client.Database(database.DatabaseName).Collection(recipeCollectionName).DeleteOne(
+		ctx, bson.D{{"id", mongoObjectID}},
+	)
 	if err != nil {
 		log.Printf("Could not delete Recipe: %v", err)
 
