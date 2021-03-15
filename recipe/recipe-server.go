@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/peppermint-recipes/peppermint-server/database"
 	"go.mongodb.org/mongo-driver/mongo"
+)
+
+var (
+	errRecipeIsNotValid = errors.New("recipe is not valid")
 )
 
 type recipeServer struct {
@@ -46,6 +51,14 @@ func (rs *recipeServer) CreateRecipeHandler(c *gin.Context) {
 	fmt.Printf("%v", c)
 	if err := c.ShouldBindJSON(&recipe); err != nil {
 		c.String(http.StatusBadRequest, err.Error())
+
+		return
+	}
+
+	if !recipe.isValid() {
+		c.String(http.StatusBadRequest, errRecipeIsNotValid.Error())
+
+		return
 	}
 
 	id, err := createRecipe(&recipe)

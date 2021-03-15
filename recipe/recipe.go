@@ -14,3 +14,11 @@ type Recipe struct {
 	Instructions string             `json:"instructions,omitempty"`
 	UserID       string             `json:"user_id"`
 }
+
+func (recipe *Recipe) isValid() bool {
+	if recipe.UserID == "" {
+		return false
+	}
+
+	return true
+}
