@@ -3,6 +3,8 @@ module github.com/peppermint-recipes/peppermint-server
 go 1.16
 
 require (
+	github.com/appleboy/gin-jwt v2.5.0+incompatible
+	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/aws/aws-sdk-go v1.37.30 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -21,5 +23,6 @@ require (
 	golang.org/x/sys v0.0.0-20210314195730-07df6a141424 // indirect
 	golang.org/x/text v0.3.5 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

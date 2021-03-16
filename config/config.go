@@ -18,8 +18,9 @@ type DBConfig struct {
 
 // TODO: add GIN_MODE=release
 type WebServerConfig struct {
-	Address string
-	Port    string
+	Address       string
+	Port          string
+	JWTSigningKey string
 }
 
 func GetConfig() *Config {
@@ -30,8 +31,9 @@ func GetConfig() *Config {
 			Password: getFromEnvAsString("DATABASE_PASSWORD", "example"),
 		},
 		Web: &WebServerConfig{
-			Address: getFromEnvAsString("WEBSERVER_ADDRESS", "127.0.0.1"),
-			Port:    getFromEnvAsString("WEBSERVER_PORT", "1337"),
+			Address:       getFromEnvAsString("WEBSERVER_ADDRESS", "127.0.0.1"),
+			Port:          getFromEnvAsString("WEBSERVER_PORT", "1337"),
+			JWTSigningKey: getFromEnvAsString("WEBSERVER_JWT_SIGNING_KEY", "change-me"),
 		},
 	}
 }
