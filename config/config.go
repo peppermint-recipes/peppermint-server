@@ -33,7 +33,7 @@ func GetConfig() *Config {
 		Web: &WebServerConfig{
 			Address:       getFromEnvAsString("WEBSERVER_ADDRESS", "127.0.0.1"),
 			Port:          getFromEnvAsString("WEBSERVER_PORT", "1337"),
-			JWTSigningKey: getFromEnvAsString("WEBSERVER_JWT_SIGNING_KEY", "change-me"),
+			JWTSigningKey: getFromEnvAsString("WEBSERVER_JWT_SIGNING_KEY", "changeme"),
 		},
 	}
 }

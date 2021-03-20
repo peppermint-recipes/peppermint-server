@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"time"
 
 	"github.com/peppermint-recipes/peppermint-server/auth"
 	"github.com/peppermint-recipes/peppermint-server/config"
@@ -31,79 +30,81 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 
 	router.GET("/livez", livezHandler)
 
-	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "test zone",
-		Key:         []byte(JWTSigningKey),
-		Timeout:     time.Hour,
-		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
-		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*User); ok {
-				return jwt.MapClaims{
-					identityKey: v.UserName,
-				}
-			}
-			return jwt.MapClaims{}
-		},
-		IdentityHandler: func(c *gin.Context) interface{} {
-			claims := jwt.ExtractClaims(c)
-			return &User{
-				UserName: claims[identityKey].(string),
-			}
-		},
-		Authenticator: auth.Authenticator,
-		Authorizator:  auth.Authorizator,
-		Unauthorized:  auth.Unauthorized,
-		// Authenticator: func(c *gin.Context) (interface{}, error) {
-		// 	var loginVals login
-		// 	if err := c.ShouldBind(&loginVals); err != nil {
-		// 		return "", jwt.ErrMissingLoginValues
-		// 	}
-		// 	userID := loginVals.Username
-		// 	password := loginVals.Password
+	authMiddleware, err := auth.RegisterAuthMiddleware(JWTSigningKey)
 
-		// 	if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
-		// 		return &User{
-		// 			UserName:  userID,
-		// 			LastName:  "Bo-Yi",
-		// 			FirstName: "Wu",
-		// 		}, nil
-		// 	}
+	// authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
+	// 	Realm:       "peppermint-server",
+	// 	Key:         []byte(JWTSigningKey),
+	// 	Timeout:     time.Hour,
+	// 	MaxRefresh:  time.Hour,
+	// 	IdentityKey: identityKey,
+	// 	PayloadFunc: func(data interface{}) jwt.MapClaims {
+	// 		if v, ok := data.(*User); ok {
+	// 			return jwt.MapClaims{
+	// 				identityKey: v.UserName,
+	// 			}
+	// 		}
+	// 		return jwt.MapClaims{}
+	// 	},
+	// 	IdentityHandler: func(c *gin.Context) interface{} {
+	// 		claims := jwt.ExtractClaims(c)
+	// 		return &User{
+	// 			UserName: claims[identityKey].(string),
+	// 		}
+	// 	},
+	// 	// Authenticator: auth.Authenticator,
+	// 	// Authorizator: auth.Authorizator,
+	// 	Unauthorized: auth.Unauthorized,
+	// 	Authenticator: func(c *gin.Context) (interface{}, error) {
+	// 		var loginVals login
+	// 		if err := c.ShouldBind(&loginVals); err != nil {
+	// 			return "", jwt.ErrMissingLoginValues
+	// 		}
+	// 		userID := loginVals.Username
+	// 		password := loginVals.Password
 
-		// 	return nil, jwt.ErrFailedAuthentication
-		// },
-		// Authorizator: func(data interface{}, c *gin.Context) bool {
-		// 	if v, ok := data.(*User); ok && v.UserName == "admin" {
-		// 		return true
-		// 	}
+	// 		if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
+	// 			return &User{
+	// 				UserName:  userID,
+	// 				LastName:  "Bo-Yi",
+	// 				FirstName: "Wu",
+	// 			}, nil
+	// 		}
 
-		// 	return false
-		// },
+	// 		return nil, jwt.ErrFailedAuthentication
+	// 	},
+	// 	Authorizator: func(data interface{}, c *gin.Context) bool {
+	// 		if v, ok := data.(*User); ok && v.UserName == "admin" {
+	// 			return true
+	// 		}
 
-		// Unauthorized: func(c *gin.Context, code int, message string) {
-		// 	c.JSON(code, gin.H{
-		// 		"code":    code,
-		// 		"message": message,
-		// 	})
-		// },
-		// TokenLookup is a string in the form of "<source>:<name>" that is used
-		// to extract token from the request.
-		// Optional. Default value "header:Authorization".
-		// Possible values:
-		// - "header:<name>"
-		// - "query:<name>"
-		// - "cookie:<name>"
-		// - "param:<name>"
-		TokenLookup: "header: Authorization, query: token, cookie: jwt",
-		// TokenLookup: "query:token",
-		// TokenLookup: "cookie:token",
+	// 		return false
+	// 	},
 
-		// TokenHeadName is a string in the header. Default value is "Bearer"
-		TokenHeadName: "Bearer",
+	// 	// Unauthorized: func(c *gin.Context, code int, message string) {
+	// 	// 	c.JSON(code, gin.H{
+	// 	// 		"code":    code,
+	// 	// 		"message": message,
+	// 	// 	})
+	// 	// },
+	// 	// TokenLookup is a string in the form of "<source>:<name>" that is used
+	// 	// to extract token from the request.
+	// 	// Optional. Default value "header:Authorization".
+	// 	// Possible values:
+	// 	// - "header:<name>"
+	// 	// - "query:<name>"
+	// 	// - "cookie:<name>"
+	// 	// - "param:<name>"
+	// 	TokenLookup: "header: Authorization, query: token, cookie: jwt",
+	// 	// TokenLookup: "query:token",
+	// 	// TokenLookup: "cookie:token",
 
-		// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
-		TimeFunc: time.Now,
-	})
+	// 	// TokenHeadName is a string in the header. Default value is "Bearer"
+	// 	TokenHeadName: "Bearer",
+
+	// 	// TimeFunc provides the current time. You can override it to use another time value. This is useful for testing or if your server uses a different time zone than your tokens.
+	// 	TimeFunc: time.Now,
+	// })
 
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
@@ -134,7 +135,7 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	}
 
 	recipes := router.Group("/recipes")
-	// recipes.Use(authMiddleware.MiddlewareFunc())
+	recipes.Use(authMiddleware.MiddlewareFunc())
 	recipes.GET("/:id", recipeServer.GetRecipeByIDHandler)
 	recipes.GET("/", recipeServer.GetAllRecipesHandler)
 	recipes.POST("/", recipeServer.CreateRecipeHandler)
