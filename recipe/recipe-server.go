@@ -61,6 +61,8 @@ func (rs *recipeServer) CreateRecipeHandler(c *gin.Context) {
 		return
 	}
 
+	recipe.LastUpdated = time.Now()
+
 	id, err := createRecipe(&recipe)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})

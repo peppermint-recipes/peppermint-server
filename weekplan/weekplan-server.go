@@ -64,6 +64,8 @@ func (rs *weekplanServer) CreateWeekplanHandler(c *gin.Context) {
 		return
 	}
 
+	weekplan.LastUpdated = time.Now()
+
 	id, err := createWeekplan(&weekplan)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})

@@ -64,6 +64,8 @@ func (sl *shoppingListServer) CreateWeekplanHandler(c *gin.Context) {
 		return
 	}
 
+	shoppingList.LastUpdated = time.Now()
+
 	id, err := createShoppingList(&shoppingList)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
