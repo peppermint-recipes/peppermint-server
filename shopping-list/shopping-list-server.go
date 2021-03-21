@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/peppermint-recipes/peppermint-server/database"
 
@@ -80,6 +81,9 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
+
+	shoppingList.LastUpdated = time.Now()
+
 	savedWeekplan, err := updateShoppingList(&shoppingList)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})

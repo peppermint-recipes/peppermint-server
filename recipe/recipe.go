@@ -1,6 +1,10 @@
 package recipe
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // Recipe is a model of a recipe
 type Recipe struct {
@@ -13,6 +17,7 @@ type Recipe struct {
 	Ingredients  []string           `json:"ingredients,omitempty"`
 	Instructions string             `json:"instructions,omitempty"`
 	UserID       string             `json:"user_id"`
+	LastUpdated  time.Time          `json:"last_updated,omitempty"`
 }
 
 func (recipe *Recipe) isValid() bool {

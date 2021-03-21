@@ -1,6 +1,8 @@
 package weekplan
 
 import (
+	"time"
+
 	"github.com/peppermint-recipes/peppermint-server/recipe"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -27,6 +29,7 @@ type weekPlan struct {
 	Friday       day                `json:"friday,omitempty"`
 	Saturday     day                `json:"saturday,omitempty"`
 	Sunday       day                `json:"sunday,omitempty"`
+	LastUpdated  time.Time          `json:"last_updated,omitempty"`
 }
 
 func (wp *weekPlan) isValid() bool {

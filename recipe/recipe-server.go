@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/peppermint-recipes/peppermint-server/database"
@@ -75,6 +76,9 @@ func (rs *recipeServer) UpdateRecipeHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
+
+	recipe.LastUpdated = time.Now()
+
 	savedRecipe, err := updateRecipe(&recipe)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err})
