@@ -18,6 +18,7 @@ type Recipe struct {
 	Instructions string             `json:"instructions,omitempty"`
 	UserID       string             `json:"user_id"`
 	LastUpdated  time.Time          `json:"last_updated,omitempty"`
+	Calories     int                `json:"calories,omitempty"`
 }
 
 func (recipe *Recipe) isValid() bool {
