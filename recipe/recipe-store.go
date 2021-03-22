@@ -128,20 +128,15 @@ func deleteRecipe(id string) error {
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	foundRecipe, err := getRecipeByID(id)
 	if err != nil {
-		log.Printf("Could not create object id from string. %v", err)
-
-		return errCouldNotCreateObjectID
+		return err
 	}
+	foundRecipe.Deleted = true
 
-	_, err = client.Database(database.DatabaseName).Collection(recipeCollectionName).DeleteOne(
-		ctx, bson.D{{"id", mongoObjectID}},
-	)
+	_, err = updateRecipe(foundRecipe)
 	if err != nil {
-		log.Printf("Could not delete Recipe: %v", err)
-
-		return errCouldNotDeleteRecipe
+		return err
 	}
 
 	return nil
