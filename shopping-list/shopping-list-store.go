@@ -86,7 +86,9 @@ func createShoppingList(sl *shoppingList) (*shoppingList, error) {
 
 	sl.ID = primitive.NewObjectID()
 
-	_, err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).InsertOne(ctx, sl)
+	_, err := client.Database(database.DatabaseName).
+		Collection(shoppingListsCollectionName).
+		InsertOne(ctx, sl)
 	if err != nil {
 		log.Printf("Could not create shopping list: %v", err)
 		return sl, errCouldNotCreateShoppingList
@@ -113,8 +115,11 @@ func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).FindOneAndUpdate(
-		ctx, bson.M{"id": sl.ID}, update, &opt).Decode(&updatedShoppingList)
+	err := client.Database(database.DatabaseName).
+		Collection(shoppingListsCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": sl.ID}, update, &opt).
+		Decode(&updatedShoppingList)
 	if err != nil {
 		log.Printf("Could not save shopping list: %v", err)
 

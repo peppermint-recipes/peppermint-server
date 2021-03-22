@@ -85,7 +85,9 @@ func createRecipe(recipe *Recipe) (*Recipe, error) {
 
 	recipe.ID = primitive.NewObjectID()
 
-	_, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).InsertOne(ctx, recipe)
+	_, err := client.Database(database.DatabaseName).
+		Collection(recipeCollectionName).
+		InsertOne(ctx, recipe)
 	if err != nil {
 		log.Printf("Could not create Recipe: %v", err)
 		return recipe, errCouldNotCreateRecipe
@@ -112,8 +114,11 @@ func updateRecipe(recipe *Recipe) (*Recipe, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(recipeCollectionName).FindOneAndUpdate(
-		ctx, bson.M{"id": recipe.ID}, update, &opt).Decode(&updatedRecipe)
+	err := client.Database(database.DatabaseName).
+		Collection(recipeCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": recipe.ID}, update, &opt).
+		Decode(&updatedRecipe)
 	if err != nil {
 		log.Printf("Could not save Recipe: %v", err)
 

@@ -86,7 +86,9 @@ func createWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 
 	weekplan.ID = primitive.NewObjectID()
 
-	_, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).InsertOne(ctx, weekplan)
+	_, err := client.Database(database.DatabaseName).
+		Collection(weekplanCollectionName).
+		InsertOne(ctx, weekplan)
 	if err != nil {
 		log.Printf("Could not create Weekplan: %v", err)
 		return weekplan, errCouldNotCreateWeekplan
@@ -113,8 +115,11 @@ func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).FindOneAndUpdate(
-		ctx, bson.M{"id": weekplan.ID}, update, &opt).Decode(&updatedWeekplan)
+	err := client.Database(database.DatabaseName).
+		Collection(weekplanCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": weekplan.ID}, update, &opt).
+		Decode(&updatedWeekplan)
 	if err != nil {
 		log.Printf("Could not save Weekplan: %v", err)
 
