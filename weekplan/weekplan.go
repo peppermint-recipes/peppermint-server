@@ -29,6 +29,7 @@ type weekPlan struct {
 	Friday       day                `json:"friday,omitempty"`
 	Saturday     day                `json:"saturday,omitempty"`
 	Sunday       day                `json:"sunday,omitempty"`
+	Deleted      bool               `json:"deleted,omitempty"`
 	LastUpdated  time.Time          `json:"last_updated,omitempty"`
 }
 

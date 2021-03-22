@@ -17,6 +17,7 @@ type shoppingList struct {
 	ID          primitive.ObjectID `json:"id,omitempty"`
 	UserID      string             `json:"user_id,omitempty"`
 	Items       []shoppingListItem `json:"items,omitempty"`
+	Deleted     bool               `json:"deleted,omitempty"`
 	LastUpdated time.Time          `json:"last_updated,omitempty"`
 }
 

@@ -17,6 +17,7 @@ type Recipe struct {
 	Ingredients  []string           `json:"ingredients,omitempty"`
 	Instructions string             `json:"instructions,omitempty"`
 	UserID       string             `json:"user_id"`
+	Deleted      bool               `json:"deleted,omitempty"`
 	LastUpdated  time.Time          `json:"last_updated,omitempty"`
 	Calories     int                `json:"calories,omitempty"`
 }
