@@ -96,12 +96,12 @@ func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
 func (ws *weekplanServer) DeleteWeekplanHandler(context *gin.Context) {
 	weekplanID := context.Param("id")
 
-	err := deleteWeekplan(weekplanID)
+	deletedWeekPlan, err := deleteWeekplan(weekplanID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"id": weekplanID})
+	context.JSON(http.StatusOK, gin.H{"weekplan": deletedWeekPlan})
 }
