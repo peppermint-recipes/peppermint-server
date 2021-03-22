@@ -91,10 +91,10 @@ func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
 func (rs *recipeServer) DeleteRecipeHandler(context *gin.Context) {
 	recipeID := context.Param("id")
 
-	err := deleteRecipe(recipeID)
+	deletedRecipe, err := deleteRecipe(recipeID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"ID": recipeID})
+	context.JSON(http.StatusOK, gin.H{"recipe": deletedRecipe})
 }

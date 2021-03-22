@@ -123,21 +123,21 @@ func updateRecipe(recipe *Recipe) (*Recipe, error) {
 	return updatedRecipe, nil
 }
 
-func deleteRecipe(id string) error {
+func deleteRecipe(id string) (*Recipe, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
 	foundRecipe, err := getRecipeByID(id)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	foundRecipe.Deleted = true
 
 	_, err = updateRecipe(foundRecipe)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return foundRecipe, nil
 }

@@ -96,12 +96,12 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
 func (sl *shoppingListServer) DeleteWeekplanHandler(context *gin.Context) {
 	shoppingListID := context.Param("id")
 
-	err := deleteShoppingList(shoppingListID)
+	deletedShoppingList, err := deleteShoppingList(shoppingListID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"id": shoppingListID})
+	context.JSON(http.StatusOK, gin.H{"shoppingList": deletedShoppingList})
 }
