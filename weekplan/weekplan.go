@@ -10,27 +10,27 @@ import (
 
 // WeekPlanDay is a model of a day for a weekplan
 type day struct {
-	Breakfast []recipe.Recipe `json:"breakfast,omitempty"`
-	Lunch     []recipe.Recipe `json:"lunch,omitempty"`
-	Snack     []recipe.Recipe `json:"snack,omitempty"`
-	Dinner    []recipe.Recipe `json:"dinner,omitempty"`
+	Breakfast []recipe.Recipe `json:"breakfast"`
+	Lunch     []recipe.Recipe `json:"lunch"`
+	Snack     []recipe.Recipe `json:"snack"`
+	Dinner    []recipe.Recipe `json:"dinner"`
 }
 
 // weekPlan is a model of a week
 type weekPlan struct {
-	ID           primitive.ObjectID `json:"id,omitempty"`
-	UserID       string             `json:"user_id,omitempty"`
-	Year         int                `json:"year,omitempty"`
-	CalendarWeek int                `json:"calendar_week,omitempty"`
-	Monday       day                `json:"monday,omitempty"`
-	Tuesday      day                `json:"tuesday,omitempty"`
-	Wednesday    day                `json:"wednesday,omitempty"`
-	Thursday     day                `json:"thursday,omitempty"`
-	Friday       day                `json:"friday,omitempty"`
-	Saturday     day                `json:"saturday,omitempty"`
-	Sunday       day                `json:"sunday,omitempty"`
-	Deleted      bool               `json:"deleted,omitempty"`
-	LastUpdated  time.Time          `json:"last_updated,omitempty"`
+	ID           primitive.ObjectID `json:"id"`
+	UserID       string             `json:"userId"`
+	Year         int                `json:"year"`
+	CalendarWeek int                `json:"calendar_week"`
+	Monday       day                `json:"monday"`
+	Tuesday      day                `json:"tuesday"`
+	Wednesday    day                `json:"wednesday"`
+	Thursday     day                `json:"thursday"`
+	Friday       day                `json:"friday"`
+	Saturday     day                `json:"saturday"`
+	Sunday       day                `json:"sunday"`
+	Deleted      bool               `json:"deleted"`
+	LastUpdated  time.Time          `json:"lastUpdated"`
 }
 
 func (wp *weekPlan) isValid() bool {

@@ -79,22 +79,20 @@ func getWeekplanByID(id string) (*weekPlan, error) {
 	return weekplan, nil
 }
 
-func createWeekplan(weekplan *weekPlan) (primitive.ObjectID, error) {
+func createWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
 	weekplan.ID = primitive.NewObjectID()
 
-	insertWeekplanResult, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).InsertOne(ctx, weekplan)
+	_, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).InsertOne(ctx, weekplan)
 	if err != nil {
 		log.Printf("Could not create Weekplan: %v", err)
-		return primitive.NilObjectID, errCouldNotCreateWeekplan
+		return weekplan, errCouldNotCreateWeekplan
 	}
 
-	databaseObjectID := insertWeekplanResult.InsertedID.(primitive.ObjectID)
-
-	return databaseObjectID, nil
+	return weekplan, nil
 }
 
 func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {

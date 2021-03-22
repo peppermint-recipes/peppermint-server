@@ -65,13 +65,13 @@ func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
 
 	shoppingList.LastUpdated = time.Now()
 
-	id, err := createShoppingList(&shoppingList)
+	createdShoppingList, err := createShoppingList(&shoppingList)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"id": id})
+	context.JSON(http.StatusOK, gin.H{"shoppingList": createdShoppingList})
 }
 
 func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {

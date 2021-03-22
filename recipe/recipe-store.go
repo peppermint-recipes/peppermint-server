@@ -78,7 +78,7 @@ func getRecipeByID(id string) (*Recipe, error) {
 	return recipe, nil
 }
 
-func createRecipe(recipe *Recipe) (primitive.ObjectID, error) {
+func createRecipe(recipe *Recipe) (*Recipe, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
@@ -88,10 +88,10 @@ func createRecipe(recipe *Recipe) (primitive.ObjectID, error) {
 	_, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).InsertOne(ctx, recipe)
 	if err != nil {
 		log.Printf("Could not create Recipe: %v", err)
-		return primitive.NilObjectID, errCouldNotCreateRecipe
+		return recipe, errCouldNotCreateRecipe
 	}
 
-	return recipe.ID, nil
+	return recipe, nil
 }
 
 func updateRecipe(recipe *Recipe) (*Recipe, error) {

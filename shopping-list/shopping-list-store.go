@@ -79,22 +79,20 @@ func getShoppingListByID(id string) (*shoppingList, error) {
 	return sl, nil
 }
 
-func createShoppingList(sl *shoppingList) (primitive.ObjectID, error) {
+func createShoppingList(sl *shoppingList) (*shoppingList, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
 	sl.ID = primitive.NewObjectID()
 
-	insertWeekplanResult, err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).InsertOne(ctx, sl)
+	_, err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).InsertOne(ctx, sl)
 	if err != nil {
 		log.Printf("Could not create shopping list: %v", err)
-		return primitive.NilObjectID, errCouldNotCreateShoppingList
+		return sl, errCouldNotCreateShoppingList
 	}
 
-	databaseObjectID := insertWeekplanResult.InsertedID.(primitive.ObjectID)
-
-	return databaseObjectID, nil
+	return sl, nil
 }
 
 func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
