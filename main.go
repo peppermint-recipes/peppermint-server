@@ -71,18 +71,20 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	recipes.DELETE("/:id", recipeServer.DeleteRecipeHandler)
 
 	weekplans := router.Group("/weekplans")
-	// weekplans.Use(authMiddleware.MiddlewareFunc())
+	weekplans.Use(authMiddleware.MiddlewareFunc())
 	weekplans.GET("/:id", weekplanServer.GetWeekplanByIDHandler)
 	weekplans.GET("/", weekplanServer.GetAllWeekplansHandler)
 	weekplans.POST("/", weekplanServer.CreateWeekplanHandler)
 	weekplans.PUT("/", weekplanServer.UpdateWeekplanHandler)
 	weekplans.DELETE("/:id", weekplanServer.DeleteWeekplanHandler)
 
-	router.GET("/shopping-lists/:id", shoppingListServer.GetShoppingListsByIDHandler)
-	router.GET("/shopping-lists/", shoppingListServer.GetAllWeekplansHandler)
-	router.POST("/shopping-lists/", shoppingListServer.CreateWeekplanHandler)
-	router.PUT("/shopping-lists/", shoppingListServer.UpdateWeekplanHandler)
-	router.DELETE("/shopping-lists/:id", shoppingListServer.DeleteWeekplanHandler)
+	shoppingLists := router.Group("/shopping-lists")
+	shoppingLists.Use(authMiddleware.MiddlewareFunc())
+	shoppingLists.GET("/:id", shoppingListServer.GetShoppingListsByIDHandler)
+	shoppingLists.GET("/", shoppingListServer.GetAllWeekplansHandler)
+	shoppingLists.POST("/", shoppingListServer.CreateWeekplanHandler)
+	shoppingLists.PUT("/", shoppingListServer.UpdateWeekplanHandler)
+	shoppingLists.DELETE("/:id", shoppingListServer.DeleteWeekplanHandler)
 
 	return router
 }
