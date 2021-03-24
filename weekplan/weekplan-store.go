@@ -79,22 +79,22 @@ func getWeekplanByID(id string) (*weekPlan, error) {
 	return weekplan, nil
 }
 
-func createWeekplan(weekplan *weekPlan) (primitive.ObjectID, error) {
+func createWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
 	weekplan.ID = primitive.NewObjectID()
 
-	insertWeekplanResult, err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).InsertOne(ctx, weekplan)
+	_, err := client.Database(database.DatabaseName).
+		Collection(weekplanCollectionName).
+		InsertOne(ctx, weekplan)
 	if err != nil {
 		log.Printf("Could not create Weekplan: %v", err)
-		return primitive.NilObjectID, errCouldNotCreateWeekplan
+		return weekplan, errCouldNotCreateWeekplan
 	}
 
-	databaseObjectID := insertWeekplanResult.InsertedID.(primitive.ObjectID)
-
-	return databaseObjectID, nil
+	return weekplan, nil
 }
 
 func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
@@ -115,8 +115,11 @@ func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(weekplanCollectionName).FindOneAndUpdate(
-		ctx, bson.M{"id": weekplan.ID}, update, &opt).Decode(&updatedWeekplan)
+	err := client.Database(database.DatabaseName).
+		Collection(weekplanCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": weekplan.ID}, update, &opt).
+		Decode(&updatedWeekplan)
 	if err != nil {
 		log.Printf("Could not save Weekplan: %v", err)
 
@@ -126,26 +129,22 @@ func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 	return updatedWeekplan, nil
 }
 
-func deleteWeekplan(id string) error {
+func deleteWeekplan(id string) (*weekPlan, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	foundWeekPlan, err := getWeekplanByID(id)
 	if err != nil {
-		log.Printf("Could not create object id from string. %v", err)
-
-		return errCouldNotCreateObjectID
+		return nil, err
 	}
 
-	_, err = client.Database(database.DatabaseName).Collection(weekplanCollectionName).DeleteOne(
-		ctx, bson.D{{"id", mongoObjectID}},
-	)
-	if err != nil {
-		log.Printf("Could not delete Weekplan: %v", err)
+	foundWeekPlan.Deleted = true
 
-		return errCouldNotDeleteWeekplan
+	_, err = updateWeekplan(foundWeekPlan)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return foundWeekPlan, nil
 }

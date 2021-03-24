@@ -3,52 +3,33 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   # Runs all steps on the VM
-  # The service containers will use host port binding instead of container networking so you access them via localhost rather than the service name
+  # The service containers will use host port binding instead of container networking so you access them via localhost
+  # rather than the service name.
   tests:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:12
+      mongo:
+        image: mongo:4.4-bionic
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: peppermint
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
         ports:
-          # will assign a random free host port
-          - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+          - 27017:27017
 
     steps:
-      - uses: actions/checkout@v1
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-      - uses: actions/cache@v2
-        id: yarn-cache
+      - name: Install Go
+        uses: actions/setup-go@v1
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Run yarn install
-        run: yarn install --frozen-lockfile --network-concurrency 1 --child-concurrency 1
-      - name: Create test.env with database connection information
-        run: |
-          cat << EOF > test.env
-          DBHOST=localhost
-          DBPORT=5432
-          DBDATABASE=peppermint
-          DBUSER=postgres
-          DBPASSWORD=postgres
-          EOF
-      - name: Run e2e-tests
-        run: yarn run test:e2e
+          go-version: 1.16
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: go test ./...

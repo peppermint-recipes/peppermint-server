@@ -79,22 +79,22 @@ func getShoppingListByID(id string) (*shoppingList, error) {
 	return sl, nil
 }
 
-func createShoppingList(sl *shoppingList) (primitive.ObjectID, error) {
+func createShoppingList(sl *shoppingList) (*shoppingList, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
 	sl.ID = primitive.NewObjectID()
 
-	insertWeekplanResult, err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).InsertOne(ctx, sl)
+	_, err := client.Database(database.DatabaseName).
+		Collection(shoppingListsCollectionName).
+		InsertOne(ctx, sl)
 	if err != nil {
 		log.Printf("Could not create shopping list: %v", err)
-		return primitive.NilObjectID, errCouldNotCreateShoppingList
+		return sl, errCouldNotCreateShoppingList
 	}
 
-	databaseObjectID := insertWeekplanResult.InsertedID.(primitive.ObjectID)
-
-	return databaseObjectID, nil
+	return sl, nil
 }
 
 func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
@@ -115,8 +115,11 @@ func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).FindOneAndUpdate(
-		ctx, bson.M{"id": sl.ID}, update, &opt).Decode(&updatedShoppingList)
+	err := client.Database(database.DatabaseName).
+		Collection(shoppingListsCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": sl.ID}, update, &opt).
+		Decode(&updatedShoppingList)
 	if err != nil {
 		log.Printf("Could not save shopping list: %v", err)
 
@@ -126,26 +129,22 @@ func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
 	return updatedShoppingList, nil
 }
 
-func deleteShoppingList(id string) error {
+func deleteShoppingList(id string) (*shoppingList, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	foundShoppingList, err := getShoppingListByID(id)
 	if err != nil {
-		log.Printf("Could not create object id from string. %v", err)
-
-		return errCouldNotCreateObjectID
+		return nil, err
 	}
 
-	_, err = client.Database(database.DatabaseName).Collection(shoppingListsCollectionName).DeleteOne(
-		ctx, bson.D{{"id", mongoObjectID}},
-	)
-	if err != nil {
-		log.Printf("Could not delete shopping list: %v", err)
+	foundShoppingList.Deleted = true
 
-		return errCouldNotDeleteShoppingList
+	_, err = updateShoppingList(foundShoppingList)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return foundShoppingList, nil
 }

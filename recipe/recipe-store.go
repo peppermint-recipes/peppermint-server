@@ -78,20 +78,22 @@ func getRecipeByID(id string) (*Recipe, error) {
 	return recipe, nil
 }
 
-func createRecipe(recipe *Recipe) (primitive.ObjectID, error) {
+func createRecipe(recipe *Recipe) (*Recipe, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
 	recipe.ID = primitive.NewObjectID()
 
-	_, err := client.Database(database.DatabaseName).Collection(recipeCollectionName).InsertOne(ctx, recipe)
+	_, err := client.Database(database.DatabaseName).
+		Collection(recipeCollectionName).
+		InsertOne(ctx, recipe)
 	if err != nil {
 		log.Printf("Could not create Recipe: %v", err)
-		return primitive.NilObjectID, errCouldNotCreateRecipe
+		return recipe, errCouldNotCreateRecipe
 	}
 
-	return recipe.ID, nil
+	return recipe, nil
 }
 
 func updateRecipe(recipe *Recipe) (*Recipe, error) {
@@ -112,8 +114,11 @@ func updateRecipe(recipe *Recipe) (*Recipe, error) {
 		ReturnDocument: &after,
 	}
 
-	err := client.Database(database.DatabaseName).Collection(recipeCollectionName).FindOneAndUpdate(
-		ctx, bson.M{"id": recipe.ID}, update, &opt).Decode(&updatedRecipe)
+	err := client.Database(database.DatabaseName).
+		Collection(recipeCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": recipe.ID}, update, &opt).
+		Decode(&updatedRecipe)
 	if err != nil {
 		log.Printf("Could not save Recipe: %v", err)
 
@@ -123,26 +128,21 @@ func updateRecipe(recipe *Recipe) (*Recipe, error) {
 	return updatedRecipe, nil
 }
 
-func deleteRecipe(id string) error {
+func deleteRecipe(id string) (*Recipe, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	foundRecipe, err := getRecipeByID(id)
 	if err != nil {
-		log.Printf("Could not create object id from string. %v", err)
+		return nil, err
+	}
+	foundRecipe.Deleted = true
 
-		return errCouldNotCreateObjectID
+	_, err = updateRecipe(foundRecipe)
+	if err != nil {
+		return nil, err
 	}
 
-	_, err = client.Database(database.DatabaseName).Collection(recipeCollectionName).DeleteOne(
-		ctx, bson.D{{"id", mongoObjectID}},
-	)
-	if err != nil {
-		log.Printf("Could not delete Recipe: %v", err)
-
-		return errCouldNotDeleteRecipe
-	}
-
-	return nil
+	return foundRecipe, nil
 }
