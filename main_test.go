@@ -11,7 +11,7 @@ import (
 
 func TestLivezRoute(t *testing.T) {
 	config := config.GetConfig()
-	testServer := httptest.NewServer(setupServer(config.DB))
+	testServer := httptest.NewServer(setupServer(config.DB, "test"))
 	defer testServer.Close()
 
 	response, err := http.Get(fmt.Sprintf("%s/livez", testServer.URL))
