@@ -5,8 +5,10 @@ import (
 	"log"
 
 	"github.com/peppermint-recipes/peppermint-server/database"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -26,27 +28,20 @@ var (
 )
 
 func hashAndSalt(pwd []byte) (string, error) {
-
-	// Use GenerateFromPassword to hash & salt pwd.
-	// MinCost is just an integer constant provided by the bcrypt
-	// package along with DefaultCost & MaxCost.
-	// The cost can be any value you want provided it isn't lower
-	// than the MinCost (4)
-	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.DefaultCost)
 	if err != nil {
 		log.Println(err)
-	} // GenerateFromPassword returns a byte slice so we need to
-	// convert the bytes to a string and return it
+		return "", errCouldNotCreateHashedAndSaltedPassword
+	}
+
 	return string(hash), nil
 }
 
 func comparePasswords(hashedPwd string, plainPwd []byte) bool {
-	// Since we'll be getting the hashed password from the DB it
-	// will be a string so we'll need to convert it to a byte slice
 	byteHash := []byte(hashedPwd)
 	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
 	if err != nil {
-		log.Println(err)
+		log.Println(errUserNotAuthorized)
 		return false
 	}
 
@@ -147,53 +142,55 @@ func createUser(user *User) (*User, error) {
 	return user, nil
 }
 
-// func updateRecipe(recipe *Recipe) (*Recipe, error) {
-// 	var updatedRecipe *Recipe
+func updateUser(user *User) (*User, error) {
+	var updatedUser *User
 
-// 	client, ctx, cancel := database.GetConnection()
-// 	defer cancel()
-// 	defer client.Disconnect(ctx)
+	client, ctx, cancel := database.GetConnection()
+	defer cancel()
+	defer client.Disconnect(ctx)
 
-// 	update := bson.M{
-// 		"$set": recipe,
-// 	}
+	update := bson.M{
+		"$set": user,
+	}
 
-// 	upsert := false
-// 	after := options.After
-// 	opt := options.FindOneAndUpdateOptions{
-// 		Upsert:         &upsert,
-// 		ReturnDocument: &after,
-// 	}
+	// TODO: handle password change
 
-// 	err := client.Database(database.DatabaseName).
-// 		Collection(userCollectionName).
-// 		FindOneAndUpdate(
-// 			ctx, bson.M{"id": recipe.ID}, update, &opt).
-// 		Decode(&updatedRecipe)
-// 	if err != nil {
-// 		log.Printf("Could not save Recipe: %v", err)
+	upsert := false
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		Upsert:         &upsert,
+		ReturnDocument: &after,
+	}
 
-// 		return nil, errCouldNotSaveRecipe
-// 	}
+	err := client.Database(database.DatabaseName).
+		Collection(userCollectionName).
+		FindOneAndUpdate(
+			ctx, bson.M{"id": user.ID}, update, &opt).
+		Decode(&updatedUser)
+	if err != nil {
+		log.Printf("Could not save User: %v", err)
 
-// 	return updatedRecipe, nil
-// }
+		return nil, errCouldNotSaveUser
+	}
 
-// func deleteRecipe(id string) (*Recipe, error) {
-// 	client, ctx, cancel := database.GetConnection()
-// 	defer cancel()
-// 	defer client.Disconnect(ctx)
+	return updatedUser, nil
+}
 
-// 	foundRecipe, err := getRecipeByID(id)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	foundRecipe.Deleted = true
+func deleteUser(id string) (*User, error) {
+	client, ctx, cancel := database.GetConnection()
+	defer cancel()
+	defer client.Disconnect(ctx)
 
-// 	_, err = updateRecipe(foundRecipe)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	foundUser, err := getUserByID(id)
+	if err != nil {
+		return nil, err
+	}
+	foundUser.Deleted = true
 
-// 	return foundRecipe, nil
-// }
+	_, err = updateUser(foundUser)
+	if err != nil {
+		return nil, err
+	}
+
+	return foundUser, nil
+}

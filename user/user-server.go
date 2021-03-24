@@ -23,17 +23,20 @@ func NewUserServer() *userServer {
 	return &userServer{mongoClient: mongoClient}
 }
 
-// func (rs *recipeServer) GetRecipeByIDHandler(context *gin.Context) {
-// 	recipeID := context.Param("id")
+func (us *userServer) GetUserByIDHandler(context *gin.Context) {
+	userID := context.Param("id")
 
-// 	var loadedRecipe, err = getRecipeByID(recipeID)
-// 	if err != nil {
-// 		context.JSON(http.StatusNotFound, gin.H{"message": err})
+	var loadedUser, err = getUserByID(userID)
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{"message": err})
 
-// 		return
-// 	}
-// 	context.JSON(http.StatusOK, gin.H{"Recipe": loadedRecipe})
-// }
+		return
+	}
+
+	loadedUser.Password = "nope"
+
+	context.JSON(http.StatusOK, gin.H{"User": loadedUser})
+}
 
 func (us *userServer) CreateUserHandler(context *gin.Context) {
 	var user User
@@ -60,31 +63,36 @@ func (us *userServer) CreateUserHandler(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"recipe": createdUser})
 }
 
-// func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
-// 	var recipe Recipe
-// 	if err := context.ShouldBindJSON(&recipe); err != nil {
-// 		log.Print(err)
-// 		context.JSON(http.StatusBadRequest, gin.H{"message": err})
-// 		return
-// 	}
+func (us *userServer) UpdateUserHandler(context *gin.Context) {
+	var user User
+	if err := context.ShouldBindJSON(&user); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": err})
+		return
+	}
 
-// 	recipe.LastUpdated = time.Now()
+	user.LastUpdated = time.Now()
 
-// 	savedRecipe, err := updateRecipe(&recipe)
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
-// 		return
-// 	}
-// 	context.JSON(http.StatusOK, gin.H{"recipe": savedRecipe})
-// }
+	savedUser, err := updateUser(&user)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
 
-// func (rs *recipeServer) DeleteRecipeHandler(context *gin.Context) {
-// 	recipeID := context.Param("id")
+	savedUser.Password = "nope"
 
-// 	deletedRecipe, err := deleteRecipe(recipeID)
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
-// 		return
-// 	}
-// 	context.JSON(http.StatusOK, gin.H{"recipe": deletedRecipe})
-// }
+	context.JSON(http.StatusOK, gin.H{"user": savedUser})
+}
+
+func (us *userServer) DeleteUserHandler(context *gin.Context) {
+	userID := context.Param("id")
+
+	deletedUser, err := deleteUser(userID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+		return
+	}
+
+	deletedUser.Password = "nope"
+
+	context.JSON(http.StatusOK, gin.H{"user": deletedUser})
+}
