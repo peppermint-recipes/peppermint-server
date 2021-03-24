@@ -33,7 +33,6 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	router.GET("/livez", livezHandler)
 
 	authMiddleware, err := auth.RegisterAuthMiddleware(JWTSigningKey)
-
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
 	}
@@ -41,13 +40,11 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	// When you use jwt.New(), the function is already automatically called for checking,
 	// which means you don't need to call it again.
 	errInit := authMiddleware.MiddlewareInit()
-
 	if errInit != nil {
 		log.Fatal("authMiddleware.MiddlewareInit() Error:" + errInit.Error())
 	}
 
 	router.POST("/login", authMiddleware.LoginHandler)
-
 	router.NoRoute(authMiddleware.MiddlewareFunc(), func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
 		log.Printf("NoRoute claims: %#v\n", claims)
@@ -58,7 +55,6 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	// Refresh time can be longer than token timeout, therefore it must be registered BEFORE the auth middleware.
 	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
 	auth.Use(authMiddleware.MiddlewareFunc())
-	auth.GET("/hello", helloHandler)
 
 	router.POST("/register", userServer.CreateUserHandler)
 
@@ -95,28 +91,4 @@ func main() {
 		config.DB,
 		config.Web.JWTSigningKey,
 	).Run(config.Web.Address + ":" + config.Web.Port)
-}
-
-type login struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
-}
-
-var identityKey = "id"
-
-func helloHandler(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(identityKey)
-	c.JSON(200, gin.H{
-		"userID":   claims[identityKey],
-		"userName": user.(*User).UserName,
-		"text":     "Hello World.",
-	})
-}
-
-// User demo
-type User struct {
-	UserName  string
-	FirstName string
-	LastName  string
 }

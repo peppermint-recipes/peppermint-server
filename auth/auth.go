@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"log"
 	"time"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
@@ -10,9 +9,8 @@ import (
 )
 
 type User struct {
-	UserName  string
-	FirstName string
-	LastName  string
+	UserName string
+	UserID   string
 }
 
 type login struct {
@@ -39,7 +37,7 @@ func RegisterAuthMiddleware(JWTSigningKey string) (*jwt.GinJWTMiddleware, error)
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
-					identityKey: v.UserName,
+					identityKey: string(v.UserID),
 				}
 			}
 			return jwt.MapClaims{}
@@ -47,11 +45,9 @@ func RegisterAuthMiddleware(JWTSigningKey string) (*jwt.GinJWTMiddleware, error)
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			return &User{
-				UserName: claims[identityKey].(string),
+				UserID: claims[identityKey].(string),
 			}
 		},
-		// Authenticator: auth.Authenticator,
-		// Authorizator: auth.Authorizator,
 		Unauthorized: Unauthorized,
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			var loginVals login
@@ -61,32 +57,15 @@ func RegisterAuthMiddleware(JWTSigningKey string) (*jwt.GinJWTMiddleware, error)
 			userID := loginVals.Username
 			password := loginVals.Password
 
-			log.Printf("UserID: %s Password: %s", userID, password)
-
 			user, err := user.IsUserAuthorized(userID, password)
 			if err != nil {
 				return nil, jwt.ErrFailedAuthentication
 			}
 
-			// log.Printf("User authorized?: %s", user)
-
 			return &User{
-				UserName:  user.Name,
-				LastName:  user.Name,
-				FirstName: user.Name,
+				UserName: user.Name,
+				UserID:   user.ID.String(),
 			}, nil
-
-			// return user, nil
-
-			// if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
-			// 	return &User{
-			// 		UserName:  userID,
-			// 		LastName:  "Bo-Yi",
-			// 		FirstName: "Wu",
-			// 	}, nil
-			// }
-
-			// return nil, jwt.ErrFailedAuthentication
 		},
 		// TokenLookup is a string in the form of "<source>:<name>" that is used
 		// to extract token from the request.
