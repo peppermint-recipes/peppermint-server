@@ -30,7 +30,7 @@ func (rs *recipeServer) GetAllRecipesHandler(context *gin.Context) {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"recipes": loadedTasks})
+	context.JSON(http.StatusOK, loadedTasks)
 }
 
 func (rs *recipeServer) GetRecipeByIDHandler(context *gin.Context) {
@@ -42,7 +42,7 @@ func (rs *recipeServer) GetRecipeByIDHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"Recipe": loadedRecipe})
+	context.JSON(http.StatusOK, loadedRecipe)
 }
 
 func (rs *recipeServer) CreateRecipeHandler(context *gin.Context) {
@@ -67,7 +67,7 @@ func (rs *recipeServer) CreateRecipeHandler(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"recipe": createdRecipe})
+	context.JSON(http.StatusOK, createdRecipe)
 }
 
 func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
@@ -85,7 +85,7 @@ func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"recipe": savedRecipe})
+	context.JSON(http.StatusOK, savedRecipe)
 }
 
 func (rs *recipeServer) DeleteRecipeHandler(context *gin.Context) {
@@ -96,5 +96,5 @@ func (rs *recipeServer) DeleteRecipeHandler(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"recipe": deletedRecipe})
+	context.JSON(http.StatusOK, deletedRecipe)
 }

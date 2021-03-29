@@ -32,7 +32,7 @@ func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplans": loadedWeekplans})
+	context.JSON(http.StatusOK, loadedWeekplans)
 }
 
 func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {
@@ -44,7 +44,7 @@ func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplan": loadedWeekplan})
+	context.JSON(http.StatusOK, loadedWeekplan)
 }
 
 func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
@@ -71,7 +71,7 @@ func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplan": createdWeekplan})
+	context.JSON(http.StatusOK, createdWeekplan)
 }
 
 func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
@@ -90,7 +90,7 @@ func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplan": savedWeekplan})
+	context.JSON(http.StatusOK, savedWeekplan)
 }
 
 func (ws *weekplanServer) DeleteWeekplanHandler(context *gin.Context) {
@@ -103,5 +103,5 @@ func (ws *weekplanServer) DeleteWeekplanHandler(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"weekplan": deletedWeekPlan})
+	context.JSON(http.StatusOK, deletedWeekPlan)
 }

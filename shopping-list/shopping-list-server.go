@@ -32,7 +32,7 @@ func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingLists": loadedShoppingLists})
+	context.JSON(http.StatusOK, loadedShoppingLists)
 }
 
 func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) {
@@ -44,7 +44,7 @@ func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) 
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingList": loadedWeekplan})
+	context.JSON(http.StatusOK, loadedWeekplan)
 }
 
 func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
@@ -71,7 +71,7 @@ func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingList": createdShoppingList})
+	context.JSON(http.StatusOK, createdShoppingList)
 }
 
 func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
@@ -90,7 +90,7 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingList": savedWeekplan})
+	context.JSON(http.StatusOK, savedWeekplan)
 }
 
 func (sl *shoppingListServer) DeleteWeekplanHandler(context *gin.Context) {
@@ -103,5 +103,5 @@ func (sl *shoppingListServer) DeleteWeekplanHandler(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"shoppingList": deletedShoppingList})
+	context.JSON(http.StatusOK, deletedShoppingList)
 }
