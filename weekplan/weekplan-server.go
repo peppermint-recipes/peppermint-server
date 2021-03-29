@@ -28,13 +28,23 @@ func NewWeekplanServer() *weekplanServer {
 }
 
 func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
-	var loadedWeekplans, err = getAllWeekplans()
+	var weekplans []*weekPlan
+	weekplans, err := getAllWeekplans()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 
 		return
 	}
-	context.JSON(http.StatusOK, loadedWeekplans)
+
+	// Return [] instead of null, if no elements found.
+	if len(weekplans) == 0 {
+		recipes := make([]weekPlan, 0)
+		context.JSON(http.StatusOK, recipes)
+
+		return
+	}
+
+	context.JSON(http.StatusOK, weekplans)
 }
 
 func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {

@@ -28,14 +28,24 @@ func NewShoppingListServer() *shoppingListServer {
 }
 
 func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
-	var loadedShoppingLists, err = getAllShoppingLists()
+	var shoppingLists []*shoppingList
+
+	shoppingLists, err := getAllShoppingLists()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 
 		return
 	}
 
-	context.JSON(http.StatusOK, loadedShoppingLists)
+	// Return [] instead of null, if no elements found.
+	if len(shoppingLists) == 0 {
+		recipes := make([]shoppingList, 0)
+		context.JSON(http.StatusOK, recipes)
+
+		return
+	}
+
+	context.JSON(http.StatusOK, shoppingLists)
 }
 
 func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) {

@@ -26,13 +26,24 @@ func NewRecipeServer() *recipeServer {
 }
 
 func (rs *recipeServer) GetAllRecipesHandler(context *gin.Context) {
-	var loadedTasks, err = getAllRecipes()
+	var recipes []*Recipe
+
+	recipes, err := getAllRecipes()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 
 		return
 	}
-	context.JSON(http.StatusOK, loadedTasks)
+
+	// Return [] instead of null, if no elements found.
+	if len(recipes) == 0 {
+		recipes := make([]Recipe, 0)
+		context.JSON(http.StatusOK, recipes)
+
+		return
+	}
+
+	context.JSON(http.StatusOK, recipes)
 }
 
 func (rs *recipeServer) GetRecipeByIDHandler(context *gin.Context) {
