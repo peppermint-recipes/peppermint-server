@@ -23,6 +23,7 @@ type weekplanServer struct {
 
 func NewWeekplanServer() *weekplanServer {
 	mongoClient, _, _ := database.GetConnection()
+
 	return &weekplanServer{mongoClient: mongoClient}
 }
 
@@ -30,6 +31,7 @@ func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
 	var loadedWeekplans, err = getAllWeekplans()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
+
 		return
 	}
 	context.JSON(http.StatusOK, loadedWeekplans)
@@ -44,6 +46,7 @@ func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {
 
 		return
 	}
+
 	context.JSON(http.StatusOK, loadedWeekplan)
 }
 
@@ -71,6 +74,7 @@ func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
 
 		return
 	}
+
 	context.JSON(http.StatusOK, createdWeekplan)
 }
 
@@ -80,6 +84,7 @@ func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
 	if err := context.ShouldBindJSON(&weekplan); err != nil {
 		log.Print(err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err})
+
 		return
 	}
 
@@ -88,8 +93,10 @@ func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
 	savedWeekplan, err := updateWeekplan(&weekplan)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, savedWeekplan)
 }
 

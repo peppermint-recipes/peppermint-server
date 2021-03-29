@@ -21,6 +21,7 @@ type recipeServer struct {
 
 func NewRecipeServer() *recipeServer {
 	mongoClient, _, _ := database.GetConnection()
+
 	return &recipeServer{mongoClient: mongoClient}
 }
 
@@ -28,6 +29,7 @@ func (rs *recipeServer) GetAllRecipesHandler(context *gin.Context) {
 	var loadedTasks, err = getAllRecipes()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
+
 		return
 	}
 	context.JSON(http.StatusOK, loadedTasks)
@@ -42,6 +44,7 @@ func (rs *recipeServer) GetRecipeByIDHandler(context *gin.Context) {
 
 		return
 	}
+
 	context.JSON(http.StatusOK, loadedRecipe)
 }
 
@@ -65,8 +68,10 @@ func (rs *recipeServer) CreateRecipeHandler(context *gin.Context) {
 	createdRecipe, err := createRecipe(&recipe)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, createdRecipe)
 }
 
@@ -75,6 +80,7 @@ func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
 	if err := context.ShouldBindJSON(&recipe); err != nil {
 		log.Print(err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err})
+
 		return
 	}
 
@@ -83,8 +89,10 @@ func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
 	savedRecipe, err := updateRecipe(&recipe)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, savedRecipe)
 }
 
@@ -94,7 +102,9 @@ func (rs *recipeServer) DeleteRecipeHandler(context *gin.Context) {
 	deletedRecipe, err := deleteRecipe(recipeID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, deletedRecipe)
 }

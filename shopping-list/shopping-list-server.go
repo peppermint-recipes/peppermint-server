@@ -23,6 +23,7 @@ type shoppingListServer struct {
 
 func NewShoppingListServer() *shoppingListServer {
 	mongoClient, _, _ := database.GetConnection()
+
 	return &shoppingListServer{mongoClient: mongoClient}
 }
 
@@ -30,8 +31,10 @@ func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
 	var loadedShoppingLists, err = getAllShoppingLists()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, loadedShoppingLists)
 }
 
@@ -44,6 +47,7 @@ func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) 
 
 		return
 	}
+
 	context.JSON(http.StatusOK, loadedWeekplan)
 }
 
@@ -71,6 +75,7 @@ func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
 
 		return
 	}
+
 	context.JSON(http.StatusOK, createdShoppingList)
 }
 
@@ -80,6 +85,7 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
 	if err := context.ShouldBindJSON(&shoppingList); err != nil {
 		log.Print(err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err})
+
 		return
 	}
 
@@ -88,8 +94,10 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
 	savedWeekplan, err := updateShoppingList(&shoppingList)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
+
 	context.JSON(http.StatusOK, savedWeekplan)
 }
 
