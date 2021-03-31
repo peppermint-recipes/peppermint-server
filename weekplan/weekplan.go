@@ -21,7 +21,7 @@ type weekPlan struct {
 	ID           primitive.ObjectID `json:"id"`
 	UserID       string             `json:"userId"`
 	Year         int                `json:"year"`
-	CalendarWeek int                `json:"calendar_week"`
+	CalendarWeek int                `json:"calendarWeek"`
 	Monday       day                `json:"monday"`
 	Tuesday      day                `json:"tuesday"`
 	Wednesday    day                `json:"wednesday"`
