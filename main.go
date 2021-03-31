@@ -22,7 +22,7 @@ func CORSMiddleware(context *gin.Context) {
 	context.Header("Access-Control-Allow-Origin", "*")
 	context.Header("Access-Control-Allow-Methods", "*")
 	context.Header("Access-Control-Allow-Headers", "*")
-	context.Header("Content-Type", "application/json")
+	context.Header("Content-Type", "application/json; charset=utf-8")
 
 	if context.Request.Method != "OPTIONS" {
 		context.Next()
