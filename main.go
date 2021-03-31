@@ -17,29 +17,18 @@ func livezHandler(c *gin.Context) {
 	})
 }
 
-// TODO: CORS Middleware
-// Copied from https://asanchez.dev/blog/cors-golang-options/
-func CORS(c *gin.Context) {
+// Based on https://asanchez.dev/blog/cors-golang-options/
+func CORSMiddleware(context *gin.Context) {
+	context.Header("Access-Control-Allow-Origin", "*")
+	context.Header("Access-Control-Allow-Methods", "*")
+	context.Header("Access-Control-Allow-Headers", "*")
+	context.Header("Content-Type", "application/json")
 
-	// First, we add the headers with need to enable CORS
-	// Make sure to adjust these headers to your needs
-	c.Header("Access-Control-Allow-Origin", "*")
-	c.Header("Access-Control-Allow-Methods", "*")
-	c.Header("Access-Control-Allow-Headers", "*")
-	c.Header("Content-Type", "application/json")
-
-	// Second, we handle the OPTIONS problem
-	if c.Request.Method != "OPTIONS" {
-
-		c.Next()
-
+	if context.Request.Method != "OPTIONS" {
+		context.Next()
 	} else {
-
-		// Everytime we receive an OPTIONS request,
-		// we just return an HTTP 200 Status Code
-		// Like this, Angular can now do the real
-		// request using any other method than OPTIONS
-		c.AbortWithStatus(http.StatusOK)
+		// context.AbortWithStatus(http.StatusOK)
+		context.AbortWithStatus(http.StatusNoContent)
 	}
 }
 
@@ -47,7 +36,7 @@ func setupServer(dbConfig *config.DBConfig) *gin.Engine {
 	database.RegisterConnection(dbConfig.Username, dbConfig.Password, dbConfig.Endpoint)
 
 	router := gin.Default()
-	router.Use(CORS)
+	router.Use(CORSMiddleware)
 	recipeServer := recipe.NewRecipeServer()
 	weekplanServer := weekplan.NewWeekplanServer()
 	shoppingListServer := shoppinglist.NewShoppingListServer()
