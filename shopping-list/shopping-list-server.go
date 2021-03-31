@@ -39,8 +39,8 @@ func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
 
 	// Return [] instead of null, if no elements found.
 	if len(shoppingLists) == 0 {
-		recipes := make([]shoppingList, 0)
-		context.JSON(http.StatusOK, recipes)
+		shoppingLists := make([]shoppingList, 0)
+		context.JSON(http.StatusOK, shoppingLists)
 
 		return
 	}

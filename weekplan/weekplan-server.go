@@ -38,8 +38,8 @@ func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
 
 	// Return [] instead of null, if no elements found.
 	if len(weekplans) == 0 {
-		recipes := make([]weekPlan, 0)
-		context.JSON(http.StatusOK, recipes)
+		weekplans := make([]weekPlan, 0)
+		context.JSON(http.StatusOK, weekplans)
 
 		return
 	}
