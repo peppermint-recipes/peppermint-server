@@ -27,7 +27,6 @@ func CORSMiddleware(context *gin.Context) {
 	if context.Request.Method != "OPTIONS" {
 		context.Next()
 	} else {
-		// context.AbortWithStatus(http.StatusOK)
 		context.AbortWithStatus(http.StatusNoContent)
 	}
 }
