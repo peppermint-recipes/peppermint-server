@@ -23,16 +23,28 @@ type weekplanServer struct {
 
 func NewWeekplanServer() *weekplanServer {
 	mongoClient, _, _ := database.GetConnection()
+
 	return &weekplanServer{mongoClient: mongoClient}
 }
 
 func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
-	var loadedWeekplans, err = getAllWeekplans()
+	var weekplans []*weekPlan
+	weekplans, err := getAllWeekplans()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
+
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplans": loadedWeekplans})
+
+	// Return [] instead of null, if no elements found.
+	if len(weekplans) == 0 {
+		weekplans := make([]weekPlan, 0)
+		context.JSON(http.StatusOK, weekplans)
+
+		return
+	}
+
+	context.JSON(http.StatusOK, weekplans)
 }
 
 func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {
@@ -44,7 +56,8 @@ func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplan": loadedWeekplan})
+
+	context.JSON(http.StatusOK, loadedWeekplan)
 }
 
 func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
@@ -71,7 +84,8 @@ func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplan": createdWeekplan})
+
+	context.JSON(http.StatusOK, createdWeekplan)
 }
 
 func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
@@ -80,6 +94,7 @@ func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
 	if err := context.ShouldBindJSON(&weekplan); err != nil {
 		log.Print(err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err})
+
 		return
 	}
 
@@ -88,9 +103,11 @@ func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
 	savedWeekplan, err := updateWeekplan(&weekplan)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"weekplan": savedWeekplan})
+
+	context.JSON(http.StatusOK, savedWeekplan)
 }
 
 func (ws *weekplanServer) DeleteWeekplanHandler(context *gin.Context) {
@@ -103,5 +120,5 @@ func (ws *weekplanServer) DeleteWeekplanHandler(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"weekplan": deletedWeekPlan})
+	context.JSON(http.StatusOK, deletedWeekPlan)
 }

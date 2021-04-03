@@ -23,16 +23,29 @@ type shoppingListServer struct {
 
 func NewShoppingListServer() *shoppingListServer {
 	mongoClient, _, _ := database.GetConnection()
+
 	return &shoppingListServer{mongoClient: mongoClient}
 }
 
 func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
-	var loadedShoppingLists, err = getAllShoppingLists()
+	var shoppingLists []*shoppingList
+
+	shoppingLists, err := getAllShoppingLists()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
+
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingLists": loadedShoppingLists})
+
+	// Return [] instead of null, if no elements found.
+	if len(shoppingLists) == 0 {
+		shoppingLists := make([]shoppingList, 0)
+		context.JSON(http.StatusOK, shoppingLists)
+
+		return
+	}
+
+	context.JSON(http.StatusOK, shoppingLists)
 }
 
 func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) {
@@ -44,7 +57,8 @@ func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) 
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingList": loadedWeekplan})
+
+	context.JSON(http.StatusOK, loadedWeekplan)
 }
 
 func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
@@ -71,7 +85,8 @@ func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
 
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingList": createdShoppingList})
+
+	context.JSON(http.StatusOK, createdShoppingList)
 }
 
 func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
@@ -80,6 +95,7 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
 	if err := context.ShouldBindJSON(&shoppingList); err != nil {
 		log.Print(err)
 		context.JSON(http.StatusBadRequest, gin.H{"message": err})
+
 		return
 	}
 
@@ -88,9 +104,11 @@ func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
 	savedWeekplan, err := updateShoppingList(&shoppingList)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
+
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"shoppingList": savedWeekplan})
+
+	context.JSON(http.StatusOK, savedWeekplan)
 }
 
 func (sl *shoppingListServer) DeleteWeekplanHandler(context *gin.Context) {
@@ -103,5 +121,5 @@ func (sl *shoppingListServer) DeleteWeekplanHandler(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"shoppingList": deletedShoppingList})
+	context.JSON(http.StatusOK, deletedShoppingList)
 }

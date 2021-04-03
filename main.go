@@ -3,7 +3,11 @@ package main
 import (
 	"log"
 
+	"net/http"
+
 	"github.com/peppermint-recipes/peppermint-server/auth"
+
+	"github.com/gin-gonic/gin"
 	"github.com/peppermint-recipes/peppermint-server/config"
 	"github.com/peppermint-recipes/peppermint-server/database"
 	"github.com/peppermint-recipes/peppermint-server/recipe"
@@ -12,7 +16,6 @@ import (
 	"github.com/peppermint-recipes/peppermint-server/weekplan"
 
 	jwt "github.com/appleboy/gin-jwt/v2"
-	"github.com/gin-gonic/gin"
 )
 
 func livezHandler(c *gin.Context) {
@@ -21,10 +24,25 @@ func livezHandler(c *gin.Context) {
 	})
 }
 
+// Based on https://asanchez.dev/blog/cors-golang-options/
+func CORSMiddleware(context *gin.Context) {
+	context.Header("Access-Control-Allow-Origin", "*")
+	context.Header("Access-Control-Allow-Methods", "*")
+	context.Header("Access-Control-Allow-Headers", "*")
+	context.Header("Content-Type", "application/json; charset=utf-8")
+
+	if context.Request.Method != "OPTIONS" {
+		context.Next()
+	} else {
+		context.AbortWithStatus(http.StatusNoContent)
+	}
+}
+
 func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	database.RegisterConnection(dbConfig.Username, dbConfig.Password, dbConfig.Endpoint)
 
 	router := gin.Default()
+	router.Use(CORSMiddleware)
 	recipeServer := recipe.NewRecipeServer()
 	weekplanServer := weekplan.NewWeekplanServer()
 	shoppingListServer := shoppinglist.NewShoppingListServer()

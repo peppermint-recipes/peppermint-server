@@ -14,7 +14,7 @@ type Recipe struct {
 	TotalTime    int                `json:"totalTime"`
 	Servings     int                `json:"servings"`
 	Categories   []string           `json:"categories"`
-	Ingredients  []string           `json:"ingredients"`
+	Ingredients  string             `json:"ingredients"`
 	Instructions string             `json:"instructions"`
 	UserID       string             `json:"userId"`
 	Deleted      bool               `json:"deleted"`
