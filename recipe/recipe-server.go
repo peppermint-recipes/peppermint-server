@@ -4,9 +4,12 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/peppermint-recipes/peppermint-server/auth"
 	"github.com/peppermint-recipes/peppermint-server/database"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -25,10 +28,26 @@ func NewRecipeServer() *recipeServer {
 	return &recipeServer{mongoClient: mongoClient}
 }
 
+func getUserIDFromContext(context *gin.Context) (string, error) {
+	// claims := jwt.ExtractClaims(context)
+	user, _ := context.Get(auth.IdentityKey)
+
+	userID := user.(*auth.User).UserID
+
+	pat := regexp.MustCompile(`"\w+"`)
+	s := pat.FindString(userID)
+
+	test := strings.ReplaceAll(s, `"`, ``)
+
+	return test, nil
+}
+
 func (rs *recipeServer) GetAllRecipesHandler(context *gin.Context) {
 	var recipes []*Recipe
 
-	recipes, err := getAllRecipes()
+	userID, _ := getUserIDFromContext(context)
+
+	recipes, err := getAllRecipesForUser(userID)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 
@@ -48,8 +67,9 @@ func (rs *recipeServer) GetAllRecipesHandler(context *gin.Context) {
 
 func (rs *recipeServer) GetRecipeByIDHandler(context *gin.Context) {
 	recipeID := context.Param("id")
+	userID, _ := getUserIDFromContext(context)
 
-	var loadedRecipe, err = getRecipeByID(recipeID)
+	var loadedRecipe, err = getRecipeByID(recipeID, userID)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
 
@@ -74,6 +94,9 @@ func (rs *recipeServer) CreateRecipeHandler(context *gin.Context) {
 		return
 	}
 
+	userID, _ := getUserIDFromContext(context)
+
+	recipe.UserID = userID
 	recipe.LastUpdated = time.Now()
 
 	createdRecipe, err := createRecipe(&recipe)
@@ -94,7 +117,9 @@ func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
 
 		return
 	}
+	userID, _ := getUserIDFromContext(context)
 
+	recipe.UserID = userID
 	recipe.LastUpdated = time.Now()
 
 	savedRecipe, err := updateRecipe(&recipe)
@@ -109,8 +134,9 @@ func (rs *recipeServer) UpdateRecipeHandler(context *gin.Context) {
 
 func (rs *recipeServer) DeleteRecipeHandler(context *gin.Context) {
 	recipeID := context.Param("id")
+	userID, _ := getUserIDFromContext(context)
 
-	deletedRecipe, err := deleteRecipe(recipeID)
+	deletedRecipe, err := deleteRecipe(recipeID, userID)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": err})
 

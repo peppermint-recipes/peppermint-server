@@ -23,7 +23,7 @@ var (
 	errCouldNotCreateObjectID = errors.New("could not create object id")
 )
 
-func getAllRecipes() ([]*Recipe, error) {
+func getAllRecipesForUser(userID string) ([]*Recipe, error) {
 	var recipes []*Recipe
 
 	client, ctx, cancel := database.GetConnection()
@@ -32,7 +32,7 @@ func getAllRecipes() ([]*Recipe, error) {
 	db := client.Database(database.DatabaseName)
 	collection := db.Collection(recipeCollectionName)
 
-	cursor, err := collection.Find(ctx, bson.D{})
+	cursor, err := collection.Find(ctx, bson.M{"userid": userID})
 	if err != nil {
 		return nil, err
 	}
@@ -47,14 +47,14 @@ func getAllRecipes() ([]*Recipe, error) {
 	return recipes, nil
 }
 
-func getRecipeByID(id string) (*Recipe, error) {
+func getRecipeByID(recipdeID string, userID string) (*Recipe, error) {
 	var recipe *Recipe
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	mongoObjectID, err := primitive.ObjectIDFromHex(id)
+	mongoObjectID, err := primitive.ObjectIDFromHex(recipdeID)
 	if err != nil {
 		log.Printf("Could not create object id from string. %v", err)
 
@@ -63,7 +63,7 @@ func getRecipeByID(id string) (*Recipe, error) {
 
 	db := client.Database(database.DatabaseName)
 	collection := db.Collection(recipeCollectionName)
-	result := collection.FindOne(ctx, bson.D{{"id", mongoObjectID}})
+	result := collection.FindOne(ctx, bson.M{"id": mongoObjectID, "userid": userID})
 	if result == nil {
 		return nil, errCouldNotFindRecipe
 	}
@@ -128,12 +128,12 @@ func updateRecipe(recipe *Recipe) (*Recipe, error) {
 	return updatedRecipe, nil
 }
 
-func deleteRecipe(id string) (*Recipe, error) {
+func deleteRecipe(id string, userID string) (*Recipe, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
 
-	foundRecipe, err := getRecipeByID(id)
+	foundRecipe, err := getRecipeByID(id, userID)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ func Unauthorized(c *gin.Context, code int, message string) {
 	})
 }
 
-var identityKey = "id"
+var IdentityKey = "id"
 
 func RegisterAuthMiddleware(JWTSigningKey string) (*jwt.GinJWTMiddleware, error) {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
@@ -33,11 +33,11 @@ func RegisterAuthMiddleware(JWTSigningKey string) (*jwt.GinJWTMiddleware, error)
 		Key:         []byte(JWTSigningKey),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
-		IdentityKey: identityKey,
+		IdentityKey: IdentityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*User); ok {
 				return jwt.MapClaims{
-					identityKey: string(v.UserID),
+					IdentityKey: string(v.UserID),
 				}
 			}
 			return jwt.MapClaims{}
@@ -45,7 +45,7 @@ func RegisterAuthMiddleware(JWTSigningKey string) (*jwt.GinJWTMiddleware, error)
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			return &User{
-				UserID: claims[identityKey].(string),
+				UserID: claims[IdentityKey].(string),
 			}
 		},
 		Unauthorized: Unauthorized,
