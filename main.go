@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/peppermint-recipes/peppermint-server/auth"
+	"github.com/peppermint-recipes/peppermint-server/userSettings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/peppermint-recipes/peppermint-server/config"
@@ -47,6 +48,7 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	weekplanServer := weekplan.NewWeekplanServer()
 	shoppingListServer := shoppinglist.NewShoppingListServer()
 	userServer := user.NewUserServer()
+	userSettingsServer := userSettings.NewUserSettingsServer()
 
 	router.GET("/livez", livezHandler)
 
@@ -99,6 +101,13 @@ func setupServer(dbConfig *config.DBConfig, JWTSigningKey string) *gin.Engine {
 	shoppingLists.POST("/", shoppingListServer.CreateWeekplanHandler)
 	shoppingLists.PUT("/", shoppingListServer.UpdateWeekplanHandler)
 	shoppingLists.DELETE("/:id", shoppingListServer.DeleteWeekplanHandler)
+
+	userSettings := router.Group("/user-settings")
+	userSettings.Use(authMiddleware.MiddlewareFunc())
+	userSettings.GET("/", userSettingsServer.GetUserSettingsForUserHandler)
+	userSettings.POST("/", userSettingsServer.CreateUserSettingsHandler)
+	userSettings.PUT("/", userSettingsServer.UpdateUserSettingsHandler)
+	userSettings.DELETE("/:id", userSettingsServer.DeleteUserSettingsHandler)
 
 	return router
 }
