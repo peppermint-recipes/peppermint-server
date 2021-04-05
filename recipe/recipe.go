@@ -23,9 +23,5 @@ type Recipe struct {
 }
 
 func (recipe *Recipe) isValid() bool {
-	if recipe.UserID == "" {
-		return false
-	}
-
-	return true
+	return recipe.UserID != ""
 }
