@@ -32,4 +32,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run tests
-        run: go test ./...
+        run: make test
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install staticcheck
+        run: GOBIN=$HOME/go/bin go get honnef.co/go/tools/cmd/staticcheck
+      - name: lint
+        run: PATH=$PATH:$HOME/go/bin make lint
