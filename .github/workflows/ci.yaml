@@ -44,6 +44,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Install staticcheck
-        run: go get honnef.co/go/tools/cmd/staticcheck
+        run: GOBIN=$HOME/go/bin go get honnef.co/go/tools/cmd/staticcheck
       - name: lint
-        run: make lint
+        run: PATH=$PATH:$GOPATH/bin make lint
