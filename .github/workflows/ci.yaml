@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Install staticcheck
         run: GOBIN=$HOME/go/bin go get honnef.co/go/tools/cmd/staticcheck
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
       - name: lint
         run: PATH=$PATH:$HOME/go/bin make lint
