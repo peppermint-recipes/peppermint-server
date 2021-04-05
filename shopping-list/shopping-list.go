@@ -22,9 +22,5 @@ type shoppingList struct {
 }
 
 func (sl *shoppingList) isValid() bool {
-	if sl.UserID == "" {
-		return false
-	}
-
-	return true
+	return sl.UserID != ""
 }

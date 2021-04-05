@@ -20,7 +20,6 @@ var (
 	errCouldNotFindShoppingList   = errors.New("could not find shopping list")
 	errCouldNotCreateShoppingList = errors.New("could not create shopping list")
 	errCouldNotSaveShoppingList   = errors.New("could not save shopping list")
-	errCouldNotDeleteShoppingList = errors.New("could not delete shopping list")
 	errCouldNotCreateObjectID     = errors.New("could not create object id")
 )
 

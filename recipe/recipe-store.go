@@ -19,7 +19,6 @@ var (
 	errCouldNotFindRecipe     = errors.New("could not find recipe")
 	errCouldNotCreateRecipe   = errors.New("could not create recipe")
 	errCouldNotSaveRecipe     = errors.New("could not save recipe")
-	errCouldNotDeleteRecipe   = errors.New("could not delete recipe")
 	errCouldNotCreateObjectID = errors.New("could not create object id")
 )
 
