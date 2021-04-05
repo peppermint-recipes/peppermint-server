@@ -48,4 +48,4 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
       - name: lint
-        run: PATH=$PATH:$GOPATH/bin .$HOME/go/bin/staticcheck -f stylish github.com/peppermint-recipes/peppermint-server/...
+        run: PATH=$PATH:$HOME/go/bin make lint
