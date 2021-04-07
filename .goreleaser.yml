@@ -1,0 +1,31 @@
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+dockers:
+  - image_templates:
+    - "ghcr.io/peppermint-recipes/peppermint-server:latest"
+    - "ghcr.io/peppermint-recipes/peppermint-server:{{ .Tag }}"
+
+archives:
+  - replacements:
+      linux: Linux
+      amd64: x86_64
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
