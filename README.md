@@ -11,6 +11,8 @@ Then `make run` to start the server.
 
 ## Deployment
 
+Use the following `docker-compose.yml` to run peppermint on your own server.
+
 ```sh
 version: '3'
 
@@ -34,7 +36,7 @@ services:
       - mongo
 
   peppermint-server:
-    image: ghcr.io/peppermint-recipes/peppermint-server
+    image: ghcr.io/peppermint-recipes/peppermint-server:latest
     ports:
         - 0.0.0.0:8080:8080
     environment:
