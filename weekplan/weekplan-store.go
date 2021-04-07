@@ -20,7 +20,6 @@ var (
 	errCouldNotFindWeekplan   = errors.New("could not find weekplan")
 	errCouldNotCreateWeekplan = errors.New("could not create weekplan")
 	errCouldNotSaveWeekplan   = errors.New("could not save weekplan")
-	errCouldNotDeleteWeekplan = errors.New("could not delete weekplan")
 	errCouldNotCreateObjectID = errors.New("could not create object id")
 )
 
