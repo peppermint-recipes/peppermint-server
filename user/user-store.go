@@ -21,7 +21,6 @@ var (
 	errCouldNotFindUser                      = errors.New("could not find user")
 	errCouldNotCreateUser                    = errors.New("could not create user")
 	errCouldNotSaveUser                      = errors.New("could not save user")
-	errCouldNotDeleteUser                    = errors.New("could not delete user")
 	errCouldNotCreateObjectID                = errors.New("could not create object id")
 	errCouldNotCreateHashedAndSaltedPassword = errors.New("could not create hashed and salted password")
 	errUserNotAuthorized                     = errors.New("user not authorized")

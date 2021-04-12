@@ -16,9 +16,5 @@ type User struct {
 }
 
 func (user *User) isValid() bool {
-	if user.Name == "" {
-		return false
-	}
-
-	return true
+	return user.Name != ""
 }
