@@ -21,7 +21,7 @@ func setTestEnvVariables() {
 }
 
 func unsetTestEnvVariables() {
-	for key, _ := range testingEnvVaribles {
+	for key := range testingEnvVaribles {
 		os.Unsetenv(key)
 	}
 }
