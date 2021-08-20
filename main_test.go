@@ -10,10 +10,28 @@ import (
 	"testing"
 
 	"github.com/peppermint-recipes/peppermint-server/config"
+	"github.com/peppermint-recipes/peppermint-server/database"
 	"github.com/peppermint-recipes/peppermint-server/recipe"
 
 	"github.com/google/go-cmp/cmp"
 )
+
+func beforeTestHook(t *testing.T) {
+	clearDatabase(t)
+}
+
+func afterTestHook(t *testing.T) {
+	clearDatabase(t)
+}
+
+func clearDatabase(t *testing.T) {
+	client, ctx, _ := database.GetConnection()
+
+	err := client.Database(database.DatabaseName).Drop(ctx)
+	if err != nil {
+		t.Fatalf("Could not drop database %v", err)
+	}
+}
 
 func validateHttp200Response(t *testing.T, response *http.Response) {
 	if response.StatusCode != 200 {
@@ -46,6 +64,9 @@ func TestLivezRoute(t *testing.T) {
 }
 
 func TestRecipeRouteGet(t *testing.T) {
+	beforeTestHook(t)
+	defer afterTestHook(t)
+
 	config := config.GetConfig()
 	testServer := httptest.NewServer(setupServer(config.DB))
 	defer testServer.Close()
@@ -60,6 +81,9 @@ func TestRecipeRouteGet(t *testing.T) {
 }
 
 func TestRecipeRouteCreate(t *testing.T) {
+	beforeTestHook(t)
+	defer afterTestHook(t)
+
 	config := config.GetConfig()
 	testServer := httptest.NewServer(setupServer(config.DB))
 	defer testServer.Close()
@@ -110,6 +134,9 @@ func TestRecipeRouteCreate(t *testing.T) {
 }
 
 func TestWeekplanRoute(t *testing.T) {
+	beforeTestHook(t)
+	defer afterTestHook(t)
+
 	config := config.GetConfig()
 	testServer := httptest.NewServer(setupServer(config.DB))
 	defer testServer.Close()
@@ -124,6 +151,9 @@ func TestWeekplanRoute(t *testing.T) {
 }
 
 func TestShoppingListRoute(t *testing.T) {
+	beforeTestHook(t)
+	defer afterTestHook(t)
+
 	config := config.GetConfig()
 	testServer := httptest.NewServer(setupServer(config.DB))
 	defer testServer.Close()
