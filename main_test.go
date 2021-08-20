@@ -1,12 +1,18 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/peppermint-recipes/peppermint-server/config"
+	"github.com/peppermint-recipes/peppermint-server/recipe"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func validateHttp200Response(t *testing.T, response *http.Response) {
@@ -39,7 +45,7 @@ func TestLivezRoute(t *testing.T) {
 	validateHttp200Response(t, response)
 }
 
-func TestRecipeRoute(t *testing.T) {
+func TestRecipeRouteGet(t *testing.T) {
 	config := config.GetConfig()
 	testServer := httptest.NewServer(setupServer(config.DB))
 	defer testServer.Close()
@@ -51,6 +57,56 @@ func TestRecipeRoute(t *testing.T) {
 	}
 
 	validateHttp200Response(t, response)
+}
+
+func TestRecipeRouteCreate(t *testing.T) {
+	config := config.GetConfig()
+	testServer := httptest.NewServer(setupServer(config.DB))
+	defer testServer.Close()
+
+	newRecipe := recipe.Recipe{
+		Name:         "",
+		ActiveTime:   1,
+		TotalTime:    2,
+		Servings:     2,
+		Categories:   []string{"test"},
+		Ingredients:  "Krams",
+		Instructions: "Test",
+		UserID:       "1",
+		Deleted:      false,
+		Calories:     1337,
+	}
+	json_data, err := json.Marshal(newRecipe)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	createResponse, err := http.Post(fmt.Sprintf("%s/recipes", testServer.URL), "application/json; charset=utf-8", bytes.NewBuffer(json_data))
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, createResponse)
+
+	getResponse, err := http.Get(fmt.Sprintf("%s/recipes", testServer.URL))
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, getResponse)
+
+	var p []recipe.Recipe
+
+	err = json.NewDecoder(getResponse.Body).Decode(&p)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	newRecipe.ID = p[0].ID
+	newRecipe.LastUpdated = p[0].LastUpdated
+
+	if !cmp.Equal(p[0], newRecipe) {
+		t.Fatalf("Expected recipe %v to be equal %v", newRecipe, p[0])
+	}
 }
 
 func TestWeekplanRoute(t *testing.T) {
