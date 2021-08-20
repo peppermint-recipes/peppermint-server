@@ -23,8 +23,8 @@ var (
 	errCouldNotCreateObjectID     = errors.New("could not create object id")
 )
 
-func getAllShoppingLists() ([]*shoppingList, error) {
-	var shoppingLists []*shoppingList
+func getAllShoppingLists() ([]*ShoppingList, error) {
+	var shoppingLists []*ShoppingList
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
@@ -47,8 +47,8 @@ func getAllShoppingLists() ([]*shoppingList, error) {
 	return shoppingLists, nil
 }
 
-func getShoppingListByID(id string) (*shoppingList, error) {
-	var sl *shoppingList
+func getShoppingListByID(id string) (*ShoppingList, error) {
+	var sl *ShoppingList
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
@@ -78,7 +78,7 @@ func getShoppingListByID(id string) (*shoppingList, error) {
 	return sl, nil
 }
 
-func createShoppingList(sl *shoppingList) (*shoppingList, error) {
+func createShoppingList(sl *ShoppingList) (*ShoppingList, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
@@ -96,8 +96,8 @@ func createShoppingList(sl *shoppingList) (*shoppingList, error) {
 	return sl, nil
 }
 
-func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
-	var updatedShoppingList *shoppingList
+func updateShoppingList(sl *ShoppingList) (*ShoppingList, error) {
+	var updatedShoppingList *ShoppingList
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
@@ -128,7 +128,7 @@ func updateShoppingList(sl *shoppingList) (*shoppingList, error) {
 	return updatedShoppingList, nil
 }
 
-func deleteShoppingList(id string) (*shoppingList, error) {
+func deleteShoppingList(id string) (*ShoppingList, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)

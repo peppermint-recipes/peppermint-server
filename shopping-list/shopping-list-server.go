@@ -28,7 +28,7 @@ func NewShoppingListServer() *shoppingListServer {
 }
 
 func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
-	var shoppingLists []*shoppingList
+	var shoppingLists []*ShoppingList
 
 	shoppingLists, err := getAllShoppingLists()
 	if err != nil {
@@ -39,7 +39,7 @@ func (sl *shoppingListServer) GetAllWeekplansHandler(context *gin.Context) {
 
 	// Return [] instead of null, if no elements found.
 	if len(shoppingLists) == 0 {
-		shoppingLists := make([]shoppingList, 0)
+		shoppingLists := make([]ShoppingList, 0)
 		context.JSON(http.StatusOK, shoppingLists)
 
 		return
@@ -62,7 +62,7 @@ func (sl *shoppingListServer) GetShoppingListsByIDHandler(context *gin.Context) 
 }
 
 func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
-	var shoppingList shoppingList
+	var shoppingList ShoppingList
 
 	fmt.Printf("%v", context)
 	if err := context.ShouldBindJSON(&shoppingList); err != nil {
@@ -90,7 +90,7 @@ func (sl *shoppingListServer) CreateWeekplanHandler(context *gin.Context) {
 }
 
 func (sl *shoppingListServer) UpdateWeekplanHandler(context *gin.Context) {
-	var shoppingList shoppingList
+	var shoppingList ShoppingList
 
 	if err := context.ShouldBindJSON(&shoppingList); err != nil {
 		log.Print(err)

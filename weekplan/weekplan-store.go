@@ -23,8 +23,8 @@ var (
 	errCouldNotCreateObjectID = errors.New("could not create object id")
 )
 
-func getAllWeekplans() ([]*weekPlan, error) {
-	var weekplans []*weekPlan
+func getAllWeekplans() ([]*WeekPlan, error) {
+	var weekplans []*WeekPlan
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
@@ -47,8 +47,8 @@ func getAllWeekplans() ([]*weekPlan, error) {
 	return weekplans, nil
 }
 
-func getWeekplanByID(id string) (*weekPlan, error) {
-	var weekplan *weekPlan
+func getWeekplanByID(id string) (*WeekPlan, error) {
+	var weekplan *WeekPlan
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
@@ -78,7 +78,7 @@ func getWeekplanByID(id string) (*weekPlan, error) {
 	return weekplan, nil
 }
 
-func createWeekplan(weekplan *weekPlan) (*weekPlan, error) {
+func createWeekplan(weekplan *WeekPlan) (*WeekPlan, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)
@@ -96,8 +96,8 @@ func createWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 	return weekplan, nil
 }
 
-func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
-	var updatedWeekplan *weekPlan
+func updateWeekplan(weekplan *WeekPlan) (*WeekPlan, error) {
+	var updatedWeekplan *WeekPlan
 
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
@@ -128,7 +128,7 @@ func updateWeekplan(weekplan *weekPlan) (*weekPlan, error) {
 	return updatedWeekplan, nil
 }
 
-func deleteWeekplan(id string) (*weekPlan, error) {
+func deleteWeekplan(id string) (*WeekPlan, error) {
 	client, ctx, cancel := database.GetConnection()
 	defer cancel()
 	defer client.Disconnect(ctx)

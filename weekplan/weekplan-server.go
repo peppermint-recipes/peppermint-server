@@ -28,7 +28,7 @@ func NewWeekplanServer() *weekplanServer {
 }
 
 func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
-	var weekplans []*weekPlan
+	var weekplans []*WeekPlan
 	weekplans, err := getAllWeekplans()
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"message": err})
@@ -38,7 +38,7 @@ func (ws *weekplanServer) GetAllWeekplansHandler(context *gin.Context) {
 
 	// Return [] instead of null, if no elements found.
 	if len(weekplans) == 0 {
-		weekplans := make([]weekPlan, 0)
+		weekplans := make([]WeekPlan, 0)
 		context.JSON(http.StatusOK, weekplans)
 
 		return
@@ -61,7 +61,7 @@ func (ws *weekplanServer) GetWeekplanByIDHandler(context *gin.Context) {
 }
 
 func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
-	var weekplan weekPlan
+	var weekplan WeekPlan
 
 	fmt.Printf("%v", context)
 	if err := context.ShouldBindJSON(&weekplan); err != nil {
@@ -89,7 +89,7 @@ func (ws *weekplanServer) CreateWeekplanHandler(context *gin.Context) {
 }
 
 func (ws *weekplanServer) UpdateWeekplanHandler(context *gin.Context) {
-	var weekplan weekPlan
+	var weekplan WeekPlan
 
 	if err := context.ShouldBindJSON(&weekplan); err != nil {
 		log.Print(err)
