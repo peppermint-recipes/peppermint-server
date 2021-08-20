@@ -12,7 +12,6 @@ import (
 	"github.com/peppermint-recipes/peppermint-server/config"
 	"github.com/peppermint-recipes/peppermint-server/database"
 	"github.com/peppermint-recipes/peppermint-server/recipe"
-
 	"github.com/peppermint-recipes/peppermint-server/weekplan"
 
 	"github.com/google/go-cmp/cmp"
@@ -160,7 +159,7 @@ func TestWeekplanRouteCreate(t *testing.T) {
 	testServer := httptest.NewServer(setupServer(config.DB))
 	defer testServer.Close()
 
-	newWeekplan := weekplan.Weekplan{
+	testRecipe := recipe.Recipe{
 		Name:         "",
 		ActiveTime:   1,
 		TotalTime:    2,
@@ -172,13 +171,17 @@ func TestWeekplanRouteCreate(t *testing.T) {
 		Deleted:      false,
 		Calories:     1337,
 	}
-	json_data, err := json.Marshal(newWeekplan)
+	testRecipeAsJSON, err := json.Marshal(testRecipe)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	createResponse, err := http.Post(fmt.Sprintf("%s/recipes", testServer.URL), "application/json; charset=utf-8", bytes.NewBuffer(json_data))
+	createResponse, err := http.Post(
+		fmt.Sprintf("%s/recipes", testServer.URL),
+		"application/json; charset=utf-8",
+		bytes.NewBuffer(testRecipeAsJSON),
+	)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -197,11 +200,70 @@ func TestWeekplanRouteCreate(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
-	newWeekplan.ID = p[0].ID
-	newWeekplan.LastUpdated = p[0].LastUpdated
+	testRecipe.ID = p[0].ID
+	testRecipe.LastUpdated = p[0].LastUpdated
 
-	if !cmp.Equal(p[0], newWeekplan) {
-		t.Fatalf("Expected recipe %v to be equal %v", newWeekplan, p[0])
+	testDay1 := weekplan.Day{
+		Breakfast: []recipe.Recipe{},
+		Lunch:     []recipe.Recipe{testRecipe},
+		Snack:     []recipe.Recipe{testRecipe},
+		Dinner:    []recipe.Recipe{},
+	}
+
+	testDay2 := weekplan.Day{
+		Breakfast: []recipe.Recipe{testRecipe},
+		Lunch:     []recipe.Recipe{},
+		Snack:     []recipe.Recipe{},
+		Dinner:    []recipe.Recipe{testRecipe},
+	}
+
+	newWeekplan := weekplan.WeekPlan{
+		UserID:       "1",
+		CalendarWeek: 1,
+		Year:         2021,
+		Monday:       testDay1,
+		Tuesday:      testDay2,
+		Wednesday:    testDay1,
+		Thursday:     testDay2,
+		Friday:       testDay1,
+		Saturday:     testDay2,
+		Sunday:       testDay1,
+	}
+
+	testWeekPlanAsJSON, err := json.Marshal(newWeekplan)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	createResponseWeekPlan, err := http.Post(
+		fmt.Sprintf("%s/weekplans", testServer.URL),
+		"application/json; charset=utf-8",
+		bytes.NewBuffer(testWeekPlanAsJSON),
+	)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, createResponseWeekPlan)
+
+	getResponseWeekPlan, err := http.Get(fmt.Sprintf("%s/weekplans", testServer.URL))
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, getResponseWeekPlan)
+
+	var w []weekplan.WeekPlan
+
+	err = json.NewDecoder(getResponseWeekPlan.Body).Decode(&w)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	newWeekplan.ID = w[0].ID
+	newWeekplan.LastUpdated = w[0].LastUpdated
+
+	if !cmp.Equal(w[0], newWeekplan) {
+		t.Fatalf("Expected recipe %v to be equal %v", newWeekplan, w[0])
 	}
 }
 
