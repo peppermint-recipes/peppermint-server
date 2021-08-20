@@ -13,6 +13,8 @@ import (
 	"github.com/peppermint-recipes/peppermint-server/database"
 	"github.com/peppermint-recipes/peppermint-server/recipe"
 
+	"github.com/peppermint-recipes/peppermint-server/weekplan"
+
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -148,6 +150,59 @@ func TestWeekplanRoute(t *testing.T) {
 	}
 
 	validateHttp200Response(t, response)
+}
+
+func TestWeekplanRouteCreate(t *testing.T) {
+	beforeTestHook(t)
+	defer afterTestHook(t)
+
+	config := config.GetConfig()
+	testServer := httptest.NewServer(setupServer(config.DB))
+	defer testServer.Close()
+
+	newWeekplan := weekplan.Weekplan{
+		Name:         "",
+		ActiveTime:   1,
+		TotalTime:    2,
+		Servings:     2,
+		Categories:   []string{"test"},
+		Ingredients:  "Krams",
+		Instructions: "Test",
+		UserID:       "1",
+		Deleted:      false,
+		Calories:     1337,
+	}
+	json_data, err := json.Marshal(newWeekplan)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	createResponse, err := http.Post(fmt.Sprintf("%s/recipes", testServer.URL), "application/json; charset=utf-8", bytes.NewBuffer(json_data))
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, createResponse)
+
+	getResponse, err := http.Get(fmt.Sprintf("%s/recipes", testServer.URL))
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, getResponse)
+
+	var p []recipe.Recipe
+
+	err = json.NewDecoder(getResponse.Body).Decode(&p)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	newWeekplan.ID = p[0].ID
+	newWeekplan.LastUpdated = p[0].LastUpdated
+
+	if !cmp.Equal(p[0], newWeekplan) {
+		t.Fatalf("Expected recipe %v to be equal %v", newWeekplan, p[0])
+	}
 }
 
 func TestShoppingListRoute(t *testing.T) {
