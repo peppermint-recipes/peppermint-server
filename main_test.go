@@ -91,13 +91,13 @@ func TestRecipeRouteCreate(t *testing.T) {
 	defer testServer.Close()
 
 	newRecipe := recipe.Recipe{
-		Name:         "",
+		Name:         "my-recipe",
 		ActiveTime:   1,
 		TotalTime:    2,
 		Servings:     2,
 		Categories:   []string{"test"},
-		Ingredients:  "Krams",
-		Instructions: "Test",
+		Ingredients:  "banana",
+		Instructions: "test all the things",
 		UserID:       "1",
 		Deleted:      false,
 		Calories:     1337,
@@ -161,13 +161,13 @@ func TestWeekplanRouteCreate(t *testing.T) {
 	defer testServer.Close()
 
 	testRecipe := recipe.Recipe{
-		Name:         "",
+		Name:         "my-recipe",
 		ActiveTime:   1,
 		TotalTime:    2,
 		Servings:     2,
 		Categories:   []string{"test"},
-		Ingredients:  "Krams",
-		Instructions: "Test",
+		Ingredients:  "banana",
+		Instructions: "test all the things",
 		UserID:       "1",
 		Deleted:      false,
 		Calories:     1337,
