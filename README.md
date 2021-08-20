@@ -18,7 +18,7 @@ version: '3'
 
 services:
   mongo:
-    image: mongo:4.4-bionic
+    image: mongo:5
     ports:
       - 127.0.0.1:27017:27017
     environment:
