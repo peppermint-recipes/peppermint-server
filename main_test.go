@@ -12,6 +12,7 @@ import (
 	"github.com/peppermint-recipes/peppermint-server/config"
 	"github.com/peppermint-recipes/peppermint-server/database"
 	"github.com/peppermint-recipes/peppermint-server/recipe"
+	shoppinglist "github.com/peppermint-recipes/peppermint-server/shopping-list"
 	"github.com/peppermint-recipes/peppermint-server/weekplan"
 
 	"github.com/google/go-cmp/cmp"
@@ -263,7 +264,7 @@ func TestWeekplanRouteCreate(t *testing.T) {
 	newWeekplan.LastUpdated = w[0].LastUpdated
 
 	if !cmp.Equal(w[0], newWeekplan) {
-		t.Fatalf("Expected recipe %v to be equal %v", newWeekplan, w[0])
+		t.Fatalf("Expected weekplans %v to be equal %v", newWeekplan, w[0])
 	}
 }
 
@@ -282,4 +283,65 @@ func TestShoppingListRoute(t *testing.T) {
 	}
 
 	validateHttp200Response(t, response)
+}
+
+func TestShoppingListRouteCreate(t *testing.T) {
+	beforeTestHook(t)
+	defer afterTestHook(t)
+
+	config := config.GetConfig()
+	testServer := httptest.NewServer(setupServer(config.DB))
+	defer testServer.Close()
+
+	testItem1 := shoppinglist.ShoppingListItem{
+		Ingredient: "Test1",
+		Unit:       "my-unit",
+		Amount:     100,
+	}
+
+	testItem2 := shoppinglist.ShoppingListItem{
+		Ingredient: "Test2",
+		Unit:       "my-unit-2",
+		Amount:     200,
+	}
+
+	newShoppingList := shoppinglist.ShoppingList{
+		UserID: "1",
+		Items:  []shoppinglist.ShoppingListItem{testItem1, testItem2},
+	}
+
+	testWeekPlanAsJSON, err := json.Marshal(newShoppingList)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	createResponseShoppingList, err := http.Post(
+		fmt.Sprintf("%s/shopping-lists", testServer.URL),
+		"application/json; charset=utf-8",
+		bytes.NewBuffer(testWeekPlanAsJSON),
+	)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, createResponseShoppingList)
+
+	getResponseShoppingList, err := http.Get(fmt.Sprintf("%s/shopping-lists", testServer.URL))
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	validateHttp200Response(t, getResponseShoppingList)
+
+	var w []shoppinglist.ShoppingList
+
+	err = json.NewDecoder(getResponseShoppingList.Body).Decode(&w)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	newShoppingList.ID = w[0].ID
+	newShoppingList.LastUpdated = w[0].LastUpdated
+
+	if !cmp.Equal(w[0], newShoppingList) {
+		t.Fatalf("Expected shopingLists %v to be equal %v", newShoppingList, w[0])
+	}
 }
