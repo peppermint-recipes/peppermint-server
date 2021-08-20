@@ -55,6 +55,5 @@ func GetConnection() (*mongo.Client, context.Context, context.CancelFunc) {
 		log.Printf("Failed to ping cluster: %v", err)
 	}
 
-	fmt.Println("Connected to MongoDB!")
 	return client, ctx, cancel
 }
