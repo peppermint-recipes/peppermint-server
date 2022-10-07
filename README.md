@@ -1,5 +1,7 @@
 # peppermint-server
 
+**This project is not actively maintained.**
+
 The backend for [peppermint-clients](https://github.com/peppermint-recipes/peppermint-clients).
 
 
